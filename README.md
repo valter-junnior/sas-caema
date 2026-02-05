@@ -18,27 +18,43 @@ Sistema automatizado para facilitar o trabalho de suporte de TI através de:
 
 ## ⚡ Instalação Rápida
 
-### Opção 1: Executável (Recomendado para Usuários)
+### Opção 1: Instalador (Recomendado para Usuários)
 ```powershell
-# Gerar executável
-.\build.bat
+# Gerar instalador profissional
+.\build\installer.bat
 
-# Executar (não precisa Python!)
-releases\SAS-Caema.exe
+# Executar instalador
+installer\Output\SAS-Caema-Setup.exe
+
+# Durante instalação:
+# ✓ Marque "Iniciar com Windows" para checkup automático
+# ✓ Escolha "Criar ícone na Área de Trabalho" (opcional)
 ```
 
-### Opção 2: Com Python (Para Desenvolvimento)
+### Opção 2: Executável Portátil
+```powershell
+# Gerar executáveis
+.\build\build.bat
+# ou: python build\build_exe.py
+
+# Executar aplicação principal
+releases\SAS-Caema.exe
+
+# Executar em modo startup (checkup silencioso)
+releases\SAS-Caema-Startup.exe
+```
+
+### Opção 3: Com Python (Para Desenvolvimento)
 ```powershell
 # Instalar dependências
 cd app
 pip install -r requirements.txt
 
-# Executar aplicação
+# Executar aplicação principal
 python app.py
 
-# Configurar startup (opcional - use menu na GUI)
-python app.py
-# Menu → Configurações → Iniciar com Windows
+# Testar modo startup
+python modules\checkup\startup\main.py
 ```
 
 ---
@@ -47,26 +63,46 @@ python app.py
 
 ### Executar Aplicação
 ```powershell
-# Com executável
+# Com instalador (após instalar)
+# Procurar "SAS-Caema" no Menu Iniciar
+
+# Executável portátil
 releases\SAS-Caema.exe
 
-# Com Python
-.\run.bat
+# Com Python (dev)
+python app\app.py
 ```
 
-### Ativar Inicialização Automática
-```powershell
-# 1. Abrir aplicação
-releases\SAS-Caema.exe
+### Inicialização Automática com Windows
+A funcionalidade de startup é configurada automaticamente durante a instalação.
 
-# 2. Menu → Configurações → Marcar "Iniciar com Windows"
-# 3. Confirmar
-# ✓ Sistema fará checkup automático toda vez que ligar o PC!
-```
+**Durante instalação:**
+- ✓ Marque "Iniciar com Windows" no assistente
+- Sistema adicionará entrada no Registro do Windows
+- Toda inicialização: janela visual no canto inferior direito mostra progresso
 
-### Gerar Executável
+**Após instalação:**
+- Startup configurado em: `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`
+- Executável: `SAS-Caema-Startup.exe` (checkup silencioso com feedback visual)
+- Desinstalar remove automaticamente do startup
+
+### Build e Distribuição
 ```powershell
-.\build.bat
+# Gerar executáveis (2 arquivos: app principal + startup)
+.\build\build.bat
+# ou: python build\build_exe.py
+
+# Gerar instalador Windows (recomendado)
+.\build\installer.bat
+# Nota: Roda build_exe.py automaticamente se necessário
+
+# Resultado:
+releases\                          # Executáveis portáteis
+├── SAS-Caema.exe
+└── SAS-Caema-Startup.exe
+
+installer\Output\                 # Instalador profissional
+└── SAS-Caema-Setup.exe
 ```
 
 ### Testar Módulos
@@ -77,7 +113,10 @@ cd app
 python modules\wallpaper\main.py
 
 # Módulo de checkup
-python mapp.py        # Aplicação principal (com startup)
+python modules\checkup\main.py
+
+# Modo startup (com feedback visual)
+python modules\checkup\startup\main.py
 ```
 
 ---
@@ -86,13 +125,35 @@ python mapp.py        # Aplicação principal (com startup)
 
 ```
 sas-caema/
-├── app/              # Código-fonte
-│   ├── install.py   # Configurar sistema
-│   └── ...
-├── docs/             # Documentação
-├── releases/         # Executáveis .exe
-├── build.bat         # Gerar executável
-└── run.bat           # Executar com Python (dev)
+├── app/                              # Código-fonte
+│   ├── common/                       # Componentes compartilhados
+│   │   ├── services/                # Serviços (checkup, logging, config)
+│   │   └── views/                   # Janelas e componentes visuais
+│   ├── modules/                      # Módulos funcionais
+│   │   ├── checkup/                 # Verificação e correção do sistema
+│   │   │   ├── startup/             # Modo startup (execução automática)
+│   │   │   │   ├── main.py         # Entry point do startup
+│   │   │   │   └── startup_feedback.py  # Janela visual de progresso
+│   │   │   ├── threads/             # Threads de checkup
+│   │   │   └── main.py              # Checkup principal
+│   │   └── wallpaper/               # Papel de parede com info do sistema
+│   ├── app.py                        # Entry point da aplicação principal
+│   └── config.py                     # Configurações
+├── build/                            # Scripts de build
+│   ├── build_exe.py                 # Gerar executáveis (PyInstaller)
+│   ├── build.bat                    # Wrapper para build_exe.py
+│   └── installer.bat                # Gerar instalador (Inno Setup)
+├── installer/                        # Instalador Windows
+│   ├── setup.iss                    # Script Inno Setup
+│   └── Output/                       # Instalador gerado
+│       └── SAS-Caema-Setup.exe
+├── releases/                         # Executáveis gerados
+│   ├── SAS-Caema.exe                # Aplicação principal
+│   └── SAS-Caema-Startup.exe        # Modo startup
+├── docs/                             # Documentação
+│   ├── changelogs/                  # Histórico de mudanças
+│   └── bugs.md                       # Issues conhecidos
+└── run.bat                           # Executar com Python (desenvolvimento)
 ```
 
 ---
@@ -132,18 +193,23 @@ python app.py
 
 ## 🔧 Requisitos
 
+### Para Usuários (Instalador)
 - **Windows:** 10/11 (64-bit)
-- **Python:** 3.8+ (apenas para desenvolvimento)
-- **Espaço:** ~100 MB
+- **Espaço:** ~150 MB
+- **Privilégios:** Administrador (para instalação em Program Files)
+
+### Para Desenvolvedores
+- **Python:** 3.13+ (3.8+ compatível)
+- **PyInstaller:** Para gerar executáveis
+- **Inno Setup 6:** Para gerar instalador (opcional)
+- **Dependências:** `pip install -r app/requirements.txt`
 
 ---
 
-## 📞 Suporte
+## Suporte
 
 Problemas? Verifique:
 1. Logs em `app/logs/sas_caema.log`
-2. Documentação em `docs/`
-3. Issues reportados em `docs/bugs.md`
 
 ---
 

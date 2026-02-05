@@ -14,7 +14,6 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from config import APP_NAME, APP_VERSION, PRIMARY_COLOR, SUCCESS_COLOR
 from common.services.logger import logger_service
-from common.services.startup_manager import StartupManager
 from modules.checkup.threads.checkup_thread import CheckupThread
 from common.views.dialogs import ResultDialogs
 
@@ -142,55 +141,10 @@ class MainWindow(QMainWindow):
         # Menu Configurações
         config_menu = menubar.addMenu('⚙️ Configurações')
         
-        # Opção de startup
-        self.startup_action = QAction('Iniciar com Windows', self)
-        self.startup_action.setCheckable(True)
-        self.startup_action.setChecked(StartupManager.is_enabled())
-        self.startup_action.triggered.connect(self.toggle_startup)
-        config_menu.addAction(self.startup_action)
-        
-        config_menu.addSeparator()
-        
         # Opção Sobre
         about_action = QAction('Sobre', self)
         about_action.triggered.connect(self.show_about)
         config_menu.addAction(about_action)
-    
-    def toggle_startup(self):
-        """Ativa/desativa inicialização com Windows"""
-        if self.startup_action.isChecked():
-            if StartupManager.enable():
-                self.logger.info("Inicialização automática ativada")
-                QMessageBox.information(
-                    self,
-                    "Configuração Salva",
-                    "✓ SAS-Caema irá iniciar automaticamente com o Windows.\n\n"
-                    "O checkup será executado em segundo plano toda vez que você ligar o computador."
-                )
-            else:
-                self.startup_action.setChecked(False)
-                QMessageBox.critical(
-                    self,
-                    "Erro",
-                    "Não foi possível ativar a inicialização automática.\n"
-                    "Verifique os logs para mais detalhes."
-                )
-        else:
-            if StartupManager.disable():
-                self.logger.info("Inicialização automática desativada")
-                QMessageBox.information(
-                    self,
-                    "Configuração Salva",
-                    "✓ SAS-Caema não iniciará mais automaticamente com o Windows."
-                )
-            else:
-                self.startup_action.setChecked(True)
-                QMessageBox.critical(
-                    self,
-                    "Erro",
-                    "Não foi possível desativar a inicialização automática.\n"
-                    "Verifique os logs para mais detalhes."
-                )
     
     def show_about(self):
         """Mostra informações sobre o app"""

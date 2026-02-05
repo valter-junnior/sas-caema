@@ -13,7 +13,6 @@ python --version >nul 2>&1
 if errorlevel 1 (
     echo [ERRO] Python nao encontrado!
     echo Por favor, instale o Python 3.8 ou superior.
-    pause
     exit /b 1
 )
 
@@ -21,5 +20,3 @@ if errorlevel 1 (
 echo Iniciando aplicacao...
 cd app
 python app.py
-
-pause
