@@ -27,6 +27,7 @@ class CheckupService:
             # Importa módulo de wallpaper
             from modules.wallpaper.main import WallpaperModule
             self.modules.append({
+                'id': 'wallpaper',
                 'name': 'Papel de Parede',
                 'module': WallpaperModule,
                 'enabled': True
@@ -99,17 +100,23 @@ class CheckupService:
                     self.logger.info(f"Corrigindo: {module_name}")
                     
                     # Encontra o módulo correspondente
+                    module_found = False
                     for module_info in self.modules:
-                        if module_info['name'].lower() == module_name.lower():
+                        if module_info['id'] == module_name:
                             module = module_info['module']()
                             success = module.execute()
                             fixes[module_name] = success
+                            module_found = True
                             
                             if success:
-                                self.logger.info(f"  ✓ {module_name} corrigido")
+                                self.logger.info(f"  ✓ {module_info['name']} corrigido com sucesso")
                             else:
-                                self.logger.error(f"  ✗ Falha ao corrigir {module_name}")
+                                self.logger.error(f"  ✗ Falha ao corrigir {module_info['name']}")
                             break
+                    
+                    if not module_found:
+                        self.logger.error(f"  ✗ Módulo '{module_name}' não encontrado")
+                        fixes[module_name] = False
                     
                 except Exception as e:
                     self.logger.error(f"Erro ao corrigir {module_name}: {e}")

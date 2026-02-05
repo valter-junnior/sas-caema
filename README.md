@@ -12,7 +12,7 @@ Sistema automatizado para facilitar o trabalho de suporte de TI através de:
 - 🔍 Checkup automático do sistema
 - 🖼️ Papel de parede com informações para suporte (IP, MAC, usuário, etc.)
 - ⚙️ Execução de soluções automatizadas
-- 🚀 Inicialização automática com Windows
+- 🚀 **Inicialização automática com Windows** (checkup em segundo plano)
 
 ---
 
@@ -33,8 +33,12 @@ releases\SAS-Caema.exe
 cd app
 pip install -r requirements.txt
 
-# Configurar inicialização automática (opcional)
-python install.py --install
+# Executar aplicação
+python app.py
+
+# Configurar startup (opcional - use menu na GUI)
+python app.py
+# Menu → Configurações → Iniciar com Windows
 ```
 
 ---
@@ -50,6 +54,16 @@ releases\SAS-Caema.exe
 .\run.bat
 ```
 
+### Ativar Inicialização Automática
+```powershell
+# 1. Abrir aplicação
+releases\SAS-Caema.exe
+
+# 2. Menu → Configurações → Marcar "Iniciar com Windows"
+# 3. Confirmar
+# ✓ Sistema fará checkup automático toda vez que ligar o PC!
+```
+
 ### Gerar Executável
 ```powershell
 .\build.bat
@@ -63,7 +77,7 @@ cd app
 python modules\wallpaper\main.py
 
 # Módulo de checkup
-python modules\checkup\main.py
+python mapp.py        # Aplicação principal (com startup)
 ```
 
 ---

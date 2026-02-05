@@ -1,10 +1,14 @@
 """
 Serviço de logging para o SAS-Caema
+Com rotação diária e limpeza automática de logs antigos
 """
 import logging
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
 import sys
+import os
+import glob
+from datetime import datetime, timedelta
 
 # Adiciona o diretório raiz ao path
 ROOT_DIR = Path(__file__).parent.parent.parent
@@ -40,14 +44,22 @@ class LoggerService:
         # Remove handlers existentes
         self.logger.handlers = []
         
-        # Handler para arquivo com rotação
-        file_handler = RotatingFileHandler(
+        # Handler para arquivo com rotação diária
+        # Rotaciona à meia-noite e mantém backups
+        file_handler = TimedRotatingFileHandler(
             LOG_CONFIG['file'],
-            maxBytes=LOG_CONFIG['max_bytes'],
-            backupCount=LOG_CONFIG['backup_count'],
+            when='midnight',
+            interval=1,
+            backupCount=LOG_CONFIG.get('backup_days', 7),
             encoding='utf-8'
         )
         file_handler.setLevel(getattr(logging, LOG_CONFIG['level']))
+        
+        # Adiciona sufixo de data nos arquivos rotacionados
+        file_handler.suffix = '%Y-%m-%d'
+        
+        # Limpa logs antigos (> 7 dias)
+        self._cleanup_old_logs()
         
         # Handler para console
         console_handler = logging.StreamHandler(sys.stdout)
@@ -65,6 +77,37 @@ class LoggerService:
         # Adiciona handlers
         self.logger.addHandler(file_handler)
         self.logger.addHandler(console_handler)
+    
+    def _cleanup_old_logs(self):
+        """Remove logs com mais de 7 dias"""
+        try:
+            log_dir = Path(LOG_CONFIG['file']).parent
+            log_pattern = Path(LOG_CONFIG['file']).stem + '*'
+            
+            # Calcula data limite (7 dias atrás)
+            cutoff_date = datetime.now() - timedelta(days=LOG_CONFIG.get('backup_days', 7))
+            
+            # Busca todos os arquivos de log
+            for log_file in log_dir.glob(log_pattern):
+                if log_file == Path(LOG_CONFIG['file']):
+                    # Não remove o arquivo principal
+                    continue
+                
+                try:
+                    # Verifica a data de modificação do arquivo
+                    file_time = datetime.fromtimestamp(log_file.stat().st_mtime)
+                    
+                    if file_time < cutoff_date:
+                        log_file.unlink()
+                        self.logger.info(f"Log antigo removido: {log_file.name}")
+                        
+                except Exception as e:
+                    # Se houver erro ao processar um arquivo, continua com os outros
+                    pass
+                    
+        except Exception as e:
+            # Se houver erro geral na limpeza, apenas registra mas não falha
+            pass
     
     def get_logger(self, name: str = None):
         """Retorna um logger"""

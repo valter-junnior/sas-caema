@@ -2,13 +2,21 @@
 Arquivo de configuração global do SAS-Caema
 """
 import os
+import sys
 from pathlib import Path
 
 # Diretórios principais
 BASE_DIR = Path(__file__).parent.absolute()
 ASSETS_DIR = BASE_DIR / "assets"
 MODULES_DIR = BASE_DIR / "modules"
-LOGS_DIR = BASE_DIR / "logs"
+
+# Diretório de logs - ajusta automaticamente para executáveis
+if getattr(sys, 'frozen', False):
+    # Quando executando como .exe
+    LOGS_DIR = Path(sys.executable).parent / "logs"
+else:
+    # Quando executando como script Python
+    LOGS_DIR = BASE_DIR / "logs"
 
 # Criar diretório de logs se não existir
 LOGS_DIR.mkdir(exist_ok=True)
@@ -50,8 +58,7 @@ LOG_CONFIG = {
     "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     "date_format": "%Y-%m-%d %H:%M:%S",
     "file": LOGS_DIR / "sas_caema.log",
-    "max_bytes": 10485760,  # 10MB
-    "backup_count": 5,
+    "backup_days": 7,  # Número de dias de logs a manter
 }
 
 # Configurações do Windows

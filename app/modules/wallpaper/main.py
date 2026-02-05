@@ -97,13 +97,39 @@ class WallpaperModule:
             current_wallpaper = self.wallpaper_setter.get_current_wallpaper()
             expected_wallpaper = str(config.OUTPUT_PATH.absolute())
             
-            is_configured = (current_wallpaper == expected_wallpaper)
+            # Se não há wallpaper configurado, precisa atualizar
+            if not current_wallpaper:
+                return {
+                    'module': 'wallpaper',
+                    'status': 'needs_update',
+                    'current': 'None',
+                    'expected': expected_wallpaper,
+                    'message': 'Papel de parede precisa ser atualizado'
+                }
+            
+            # Normaliza os paths para comparação
+            # Remove espaços, converte para lowercase para comparação case-insensitive
+            # e resolve paths completos
+            try:
+                current_normalized = Path(current_wallpaper).resolve()
+                expected_normalized = Path(expected_wallpaper).resolve()
+                
+                # Compara os paths normalizados
+                # Usa os.path.samefile para lidar com links simbólicos e diferentes formatos
+                import os
+                is_configured = os.path.samefile(current_normalized, expected_normalized)
+                
+            except (OSError, ValueError):
+                # Se samefile falhar (arquivo não existe), compara strings
+                current_normalized = Path(current_wallpaper).resolve()
+                expected_normalized = Path(expected_wallpaper).resolve()
+                is_configured = (current_normalized == expected_normalized)
             
             return {
                 'module': 'wallpaper',
                 'status': 'ok' if is_configured else 'needs_update',
-                'current': current_wallpaper,
-                'expected': expected_wallpaper,
+                'current': str(current_normalized),
+                'expected': str(expected_normalized),
                 'message': 'Papel de parede configurado' if is_configured else 'Papel de parede precisa ser atualizado'
             }
             
