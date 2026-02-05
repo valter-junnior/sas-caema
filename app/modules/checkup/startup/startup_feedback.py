@@ -94,7 +94,8 @@ class StartupFeedbackWindow(QWidget):
         content_layout.addSpacing(18)
         
         # Mensagem de status - SEM WordWrap para evitar expansão
-        self.status_label = QLabel("Iniciando verificação...")
+        # self.status_label = QLabel("Iniciando verificação...")
+        self.status_label = QLabel("Corrigindo problemas encontrados...")
         status_font = QFont("Segoe UI", 11)
         self.status_label.setFont(status_font)
         self.status_label.setAlignment(Qt.AlignCenter)
@@ -248,8 +249,8 @@ class StartupFeedbackWindow(QWidget):
             module_name: Nome do módulo
             progress: Progresso atual (0-100)
         """
-        self.set_status("Verificando sistema...", progress)
-        self.set_detail(f"Analisando: {module_name}")
+        # self.set_status("Verificando sistema...", progress)
+        # self.set_detail(f"Analisando: {module_name}")
         self.update_style(PRIMARY_COLOR)
     
     def show_fixing(self, module_name: str, progress: int):
@@ -260,8 +261,8 @@ class StartupFeedbackWindow(QWidget):
             module_name: Nome do módulo
             progress: Progresso atual (0-100)
         """
-        self.set_status("Aplicando correções...", progress)
-        self.set_detail(f"Corrigindo: {module_name}")
+        # self.set_status("Aplicando correções...", progress)
+        # self.set_detail(f"Corrigindo: {module_name}")
         self.update_style("#FF8C00")  # Laranja
     
     def show_success(self, message: str = "Sistema verificado com sucesso"):

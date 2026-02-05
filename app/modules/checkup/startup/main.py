@@ -117,7 +117,8 @@ class StartupCheckupThread(QThread):
             # Resultado final
             if fixed_count == issues_found:
                 self.logger.info(f"✓ Todos os {fixed_count} problema(s) foram corrigidos")
-                self.finished_success.emit(f"{fixed_count} problema(s) corrigido(s)!")
+                # self.finished_success.emit(f"{fixed_count} problema(s) corrigido(s)!")
+                self.finished_success.emit("")
             else:
                 self.logger.info(f"⚠ {fixed_count} de {issues_found} problema(s) corrigidos")
                 self.finished_partial.emit(fixed_count, issues_found)
