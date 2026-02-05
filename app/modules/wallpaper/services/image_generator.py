@@ -11,7 +11,7 @@ class ImageGenerator:
     """Gera imagem de papel de parede com informações sobrepostas"""
     
     def __init__(self, base_image_path: Path, text_color: str = "#FFFFFF", 
-                 text_size: int = 14, padding: int = 20, font_name: str = "Arial"):
+                 text_size: int = 18, padding: int = 20, font_name: str = "Arial"):
         """
         Inicializa o gerador de imagens
         
@@ -179,7 +179,7 @@ if __name__ == "__main__":
     generator = ImageGenerator(
         base_image_path=base_path,
         text_color="#FFFFFF",
-        text_size=16,
+        text_size=18,
         padding=20
     )
     

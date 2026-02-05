@@ -60,3 +60,5 @@ dist/
 
 # Releases (descomentar se não quiser versionar .exe)
 # releases/*.exe
+
+build_temp

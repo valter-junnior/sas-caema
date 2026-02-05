@@ -69,10 +69,6 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 ; Atalho no Startup (inicialização automática)
 Name: "{userstartup}\{#MyAppName} Checkup"; Filename: "{app}\{#MyStartupExeName}"; Tasks: startupauto
 
-[Registry]
-; Mantido como fallback (caso pasta Startup não funcione)
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "SAS_Caema_Fallback"; ValueData: """{app}\{#MyStartupExeName}"""; Flags: uninsdeletevalue; Tasks: startupauto; Check: IsAdminInstallMode
-
 [Run]
 ; Opção para executar após instalação
 Filename: "{app}\{#MyAppExeName}"; Description: "Executar {#MyAppName}"; Flags: nowait postinstall skipifsilent

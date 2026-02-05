@@ -167,8 +167,8 @@ class StartupFeedbackWindow(QWidget):
         self.set_detail("✓ Tudo OK")
         self.update_style(SUCCESS_COLOR)
         
-        # Fecha automaticamente após 3 segundos
-        QTimer.singleShot(3000, self.close_with_animation)
+        # Fecha automaticamente após 12 segundos
+        QTimer.singleShot(12000, self.close_with_animation)
     
     def show_error(self, message: str = "Erro ao verificar o sistema"):
         """
@@ -181,8 +181,8 @@ class StartupFeedbackWindow(QWidget):
         self.set_detail("✗ Verifique os logs")
         self.update_style(ERROR_COLOR)
         
-        # Fecha automaticamente após 5 segundos
-        QTimer.singleShot(5000, self.close_with_animation)
+        # Fecha automaticamente após 15 segundos
+        QTimer.singleShot(15000, self.close_with_animation)
     
     def show_partial_success(self, fixed: int, total: int):
         """
@@ -196,8 +196,8 @@ class StartupFeedbackWindow(QWidget):
         self.set_detail("⚠ Alguns problemas persistem")
         self.update_style("#FF8C00")
         
-        # Fecha automaticamente após 4 segundos
-        QTimer.singleShot(4000, self.close_with_animation)
+        # Fecha automaticamente após 13 segundos
+        QTimer.singleShot(13000, self.close_with_animation)
     
     def close_with_animation(self):
         """Fecha a janela com animação de fade out"""
