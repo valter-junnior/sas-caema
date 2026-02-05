@@ -196,7 +196,7 @@ class MainWindow(QMainWindow):
         
         # Mostra resultados detalhados
         if issues == 0:
-            self.statusBar().showMessage("✓ Sistema OK")
+            self.statusBar().showMessage("Sistema OK")
             ResultDialogs.show_success_dialog(self)
         else:
             self.statusBar().showMessage(f"Checkup concluído - {issues} problema(s)")

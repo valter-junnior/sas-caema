@@ -44,7 +44,7 @@ class CheckupModule:
             issues = result.get('issues_found', 0)
             
             if issues == 0:
-                self.logger.info("✓ Checkup concluído - sistema OK")
+                self.logger.info("Checkup concluído - sistema OK")
                 if not self.silent_mode:
                     self._show_success_notification()
             else:

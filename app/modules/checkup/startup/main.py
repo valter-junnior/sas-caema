@@ -72,7 +72,7 @@ class StartupCheckupThread(QThread):
             issues_found = sum(1 for r in checks_results if r['status'] != 'ok')
             
             if issues_found == 0:
-                self.logger.info("✓ Sistema OK - Nenhum problema encontrado")
+                self.logger.info("Sistema OK - Nenhum problema encontrado")
                 self.finished_success.emit("Sistema verificado com sucesso!")
                 return
             

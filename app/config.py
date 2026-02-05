@@ -35,7 +35,7 @@ ERROR_COLOR = "#E81123"
 # Configurações de Papel de Parede
 WALLPAPER_CONFIG = {
     "text_color": "#FFFFFF",  # Branco (para fundos escuros)
-    "text_size": 14,
+    "text_size": 20,  # Tamanho da fonte aumentado para melhor legibilidade
     "text_position": "top-right",  # top-right, top-left, bottom-right, bottom-left
     "font": "Arial",
     "background_image": ASSETS_DIR / "wallpaper_base.png",

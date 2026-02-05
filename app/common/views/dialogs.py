@@ -31,7 +31,7 @@ class ResultDialogs:
         msg.setWindowTitle("Checkup Concluído")
         
         # Título e texto
-        msg.setText("<h2 style='color: #107C10;'>✓ Sistema OK</h2>")
+        msg.setText("<h2 style='color: #107C10;'>Sistema OK</h2>")
         msg.setInformativeText(
             "<p style='font-size: 11pt;'>Nenhum problema encontrado!</p>"
             "<p style='color: #666666;'>O sistema está funcionando corretamente.</p>"
@@ -78,16 +78,12 @@ class ResultDialogs:
         # Título
         if failed_count == 0:
             title_color = "#107C10"
-            title_icon = "✓"
             title_text = "Problemas Corrigidos"
-            msg.setIcon(QMessageBox.Information)
         else:
             title_color = "#FF8C00"
-            title_icon = "⚠"
             title_text = "Atenção Necessária"
-            msg.setIcon(QMessageBox.Warning)
         
-        msg.setText(f"<h2 style='color: {title_color};'>{title_icon} {title_text}</h2>")
+        msg.setText(f"<h2 style='color: {title_color};'>{title_text}</h2>")
         
         # Monta detalhes
         details = f"<div style='font-size: 10pt;'>"
