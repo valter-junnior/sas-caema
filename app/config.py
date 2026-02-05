@@ -26,11 +26,8 @@ APP_NAME = "SAS - Caema"
 APP_VERSION = "1.0.0"
 
 # Configurações de UI
-UI_THEME = "light"  # light ou dark
 PRIMARY_COLOR = "#0078D4"  # Azul padrão do Windows
-SECONDARY_COLOR = "#005A9E"
 SUCCESS_COLOR = "#107C10"
-WARNING_COLOR = "#FF8C00"
 ERROR_COLOR = "#E81123"
 
 # Configurações de Papel de Parede
