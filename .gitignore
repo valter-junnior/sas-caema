@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Configurações locais
+local_config.py
+
+# Imagens geradas
+app/assets/wallpaper_generated.png
+
+# Arquivos temporários
+*.tmp
+*.bak
+
+# Build / PyInstaller
+build/
+dist/
+*.spec
+*.manifest
+*.exe.config
+
+# Releases (descomentar se não quiser versionar .exe)
+# releases/*.exe

@@ -1,0 +1,17 @@
+# Interface Gráfica
+PyQt5==5.15.10
+
+# Manipulação de Imagens
+Pillow==10.2.0
+
+# Informações do Sistema
+psutil==5.9.8
+
+# Notificações do Windows
+winotify==1.1.0
+
+# Logs
+colorlog==6.8.2
+
+# Build de Executável
+pyinstaller==6.3.0
