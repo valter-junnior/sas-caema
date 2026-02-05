@@ -1,1 +1,0 @@
-o sistema nao pode encontrar o caminho especificado C:\\Users\\valte\\Local\\SAS-Caema\\logs

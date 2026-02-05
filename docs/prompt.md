@@ -1,1 +1,0 @@
-analise o projeto e adocumentação.md e ajuste a tela de startup onde os texto estão ficando um em cima do outro
