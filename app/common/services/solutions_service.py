@@ -35,16 +35,17 @@ class SolutionsService:
                 'icon': '🔌'
             })
             
-            # Adicione mais soluções aqui no futuro
-            # Exemplo:
-            # self.solutions.append({
-            #     'id': 'printer_troubleshoot',
-            #     'name': 'Verificação de Impressora',
-            #     'description': 'Diagnóstico de problemas com impressoras',
-            #     'module': PrinterTroubleshootModule,
-            #     'enabled': True,
-            #     'icon': '🖨️'
-            # })
+            # Registra módulo de papel de parede
+            from modules.wallpaper.main import WallpaperModule
+            
+            self.solutions.append({
+                'id': 'wallpaper_fix',
+                'name': 'Corrigir Papel de Parede',
+                'description': 'Gera e configura o papel de parede com informações do sistema',
+                'module': WallpaperModule,
+                'enabled': True,
+                'icon': '🖼️'
+            })
             
             self.logger.info(f"Carregadas {len(self.solutions)} soluções de troubleshooting")
             

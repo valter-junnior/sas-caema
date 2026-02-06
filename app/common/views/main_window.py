@@ -231,13 +231,45 @@ class MainWindow(QMainWindow):
                     self.logger.info(f"Executando solução: {selected_id}")
                     self.statusBar().showMessage("Executando solução...")
                     
+                    # Força processamento de eventos para atualizar UI
+                    from PyQt5.QtWidgets import QApplication
+                    QApplication.processEvents()
+                    
                     # Executa a solução
                     success = solutions_service.execute_solution(selected_id)
                     
                     if success:
-                        self.statusBar().showMessage("Solução executada")
+                        self.statusBar().showMessage("Solução executada com sucesso")
+                        
+                        # Feedback específico por tipo de solução
+                        if selected_id == 'wallpaper_fix':
+                            QMessageBox.information(
+                                self,
+                                "Papel de Parede Atualizado",
+                                "O papel de parede foi gerado e configurado com sucesso!\n\n"
+                                "As informações do sistema estão agora visíveis na tela."
+                            )
+                        elif selected_id == 'network_troubleshoot':
+                            # Wizard já mostra seu próprio feedback
+                            pass
                     else:
                         self.statusBar().showMessage("Erro ao executar solução")
+                        
+                        # Erro específico por tipo de solução
+                        if selected_id == 'wallpaper_fix':
+                            QMessageBox.warning(
+                                self,
+                                "Erro ao Atualizar Papel de Parede",
+                                "Não foi possível gerar ou configurar o papel de parede.\n\n"
+                                "Verifique os logs para mais detalhes."
+                            )
+                        else:
+                            QMessageBox.warning(
+                                self,
+                                "Erro",
+                                "Não foi possível executar a solução.\n\n"
+                                "Verifique os logs para mais detalhes."
+                            )
                         
         except Exception as e:
             self.logger.error(f"Erro ao abrir menu de soluções: {e}")
