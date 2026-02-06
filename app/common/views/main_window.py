@@ -4,7 +4,7 @@ Janela principal da aplicação
 import sys
 from pathlib import Path
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                             QPushButton, QLabel, QMessageBox, QAction)
+                             QPushButton, QLabel, QMessageBox, QAction, QDialog)
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
@@ -14,8 +14,10 @@ sys.path.insert(0, str(ROOT_DIR))
 
 from config import APP_NAME, APP_VERSION, PRIMARY_COLOR, SUCCESS_COLOR
 from common.services.logger import logger_service
+from common.services.solutions_service import solutions_service
 from modules.checkup.threads.checkup_thread import CheckupThread
 from common.views.dialogs import ResultDialogs
+from common.views.solutions_dialog import SolutionsDialog
 
 
 class MainWindow(QMainWindow):
@@ -204,12 +206,46 @@ class MainWindow(QMainWindow):
     
     def show_solutions(self):
         """Mostra menu de soluções disponíveis"""
-        QMessageBox.information(
-            self,
-            "Executar Solução",
-            "Funcionalidade em desenvolvimento.\n\n"
-            "Em breve você poderá executar soluções específicas para problemas conhecidos."
-        )
+        try:
+            self.logger.info("Abrindo menu de soluções...")
+            
+            # Obtém soluções disponíveis
+            solutions = solutions_service.get_available_solutions()
+            
+            if not solutions:
+                QMessageBox.information(
+                    self,
+                    "Executar Solução",
+                    "Nenhuma solução de troubleshooting disponível no momento."
+                )
+                return
+            
+            # Abre dialog de seleção
+            dialog = SolutionsDialog(solutions, self)
+            result = dialog.exec_()
+            
+            if result == QDialog.Accepted:
+                selected_id = dialog.get_selected_solution()
+                
+                if selected_id:
+                    self.logger.info(f"Executando solução: {selected_id}")
+                    self.statusBar().showMessage("Executando solução...")
+                    
+                    # Executa a solução
+                    success = solutions_service.execute_solution(selected_id)
+                    
+                    if success:
+                        self.statusBar().showMessage("Solução executada")
+                    else:
+                        self.statusBar().showMessage("Erro ao executar solução")
+                        
+        except Exception as e:
+            self.logger.error(f"Erro ao abrir menu de soluções: {e}")
+            QMessageBox.critical(
+                self,
+                "Erro",
+                f"Erro ao abrir menu de soluções:\n{str(e)}"
+            )
     
     def closeEvent(self, event):
         """Evento de fechamento da janela"""
