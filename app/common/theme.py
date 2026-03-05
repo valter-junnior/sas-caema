@@ -173,7 +173,7 @@ class Styles:
     def card() -> str:
         c = Colors
         return f"""
-            QFrame {{
+            QFrame#card {{
                 background-color: {c.SURFACE};
                 border: 1px solid {c.BORDER};
                 border-radius: 10px;

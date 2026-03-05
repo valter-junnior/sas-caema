@@ -26,6 +26,7 @@ class SolutionCard(QFrame):
         super().__init__(parent)
         self._solution_id = solution['id']
         self._is_selected = False
+        self.setObjectName("solutionCard")
         self.setCursor(QCursor(Qt.PointingHandCursor))
         self._apply_style(selected=False)
 
@@ -59,7 +60,7 @@ class SolutionCard(QFrame):
     def _apply_style(self, selected: bool):
         if selected:
             self.setStyleSheet(f"""
-                QFrame {{
+                QFrame#solutionCard {{
                     background-color: {Colors.PRIMARY_SURFACE};
                     border: 2px solid {Colors.PRIMARY};
                     border-radius: 8px;
@@ -67,12 +68,12 @@ class SolutionCard(QFrame):
             """)
         else:
             self.setStyleSheet(f"""
-                QFrame {{
+                QFrame#solutionCard {{
                     background-color: {Colors.SURFACE};
                     border: 1.5px solid {Colors.BORDER};
                     border-radius: 8px;
                 }}
-                QFrame:hover {{
+                QFrame#solutionCard:hover {{
                     border-color: {Colors.PRIMARY};
                     background-color: {Colors.BACKGROUND};
                 }}

@@ -112,8 +112,8 @@ class MainWindow(QMainWindow):
         content_layout.setSpacing(20)
 
         welcome = QLabel("O que você quer fazer hoje?")
-        welcome.setFont(Fonts.subheading(11))
-        welcome.setStyleSheet(f"color: {Colors.TEXT_SECONDARY}; background: transparent;")
+        welcome.setFont(Fonts.heading(16))
+        welcome.setStyleSheet(f"color: {Colors.TEXT_PRIMARY}; background: transparent;")
         content_layout.addWidget(welcome)
 
         # Cards de ação

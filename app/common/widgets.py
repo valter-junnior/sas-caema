@@ -69,6 +69,7 @@ class Card(QFrame):
     """Card branco com borda e sombra suave."""
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("card")
         self.setStyleSheet(Styles.card())
         shadow = QGraphicsDropShadowEffect(self)
         shadow.setBlurRadius(16)
@@ -173,9 +174,10 @@ class InfoBanner(QFrame):
 
     def __init__(self, text: str, kind: str = 'info', parent=None):
         super().__init__(parent)
+        self.setObjectName("infoBanner")
         color, bg, border = self._PALETTE.get(kind, self._PALETTE['info'])
         self.setStyleSheet(f"""
-            QFrame {{
+            QFrame#infoBanner {{
                 background-color: {bg};
                 border: 1px solid {border};
                 border-left: 4px solid {color};
