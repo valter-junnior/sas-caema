@@ -1,179 +1,196 @@
 """
-Dialog de seleção de soluções de troubleshooting
+Dialog de seleção de soluções — layout moderno baseado em cards.
 """
-from pathlib import Path
 import sys
-from PyQt5.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, 
-                             QPushButton, QListWidget, QListWidgetItem)
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from pathlib import Path
+from PyQt5.QtWidgets import (
+    QDialog, QVBoxLayout, QHBoxLayout, QLabel, QWidget, QFrame,
+    QSizePolicy,
+)
+from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QCursor, QFont
 
-# Adiciona o diretório raiz ao path
 ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from config import PRIMARY_COLOR
+from common.theme import Colors, Fonts
+from common.widgets import PrimaryButton, SecondaryButton, BodyLabel
+
+
+class SolutionCard(QFrame):
+    """Card selecionável para uma solução de troubleshooting."""
+
+    selected = pyqtSignal(str)  # emite o id da solução
+
+    def __init__(self, solution: dict, parent=None):
+        super().__init__(parent)
+        self._solution_id = solution['id']
+        self._is_selected = False
+        self.setCursor(QCursor(Qt.PointingHandCursor))
+        self._apply_style(selected=False)
+
+        layout = QHBoxLayout(self)
+        layout.setContentsMargins(16, 14, 16, 14)
+        layout.setSpacing(14)
+
+        icon_lbl = QLabel(solution.get('icon', '🔧'))
+        icon_lbl.setFont(QFont(Fonts.FAMILY, 18))
+        icon_lbl.setAlignment(Qt.AlignVCenter | Qt.AlignHCenter)
+        icon_lbl.setFixedWidth(40)
+        icon_lbl.setStyleSheet("background: transparent;")
+        layout.addWidget(icon_lbl)
+
+        text_col = QVBoxLayout()
+        text_col.setSpacing(3)
+
+        name_lbl = QLabel(solution.get('name', ''))
+        name_lbl.setFont(Fonts.heading(11))
+        name_lbl.setStyleSheet(f"color: {Colors.TEXT_PRIMARY}; background: transparent;")
+        text_col.addWidget(name_lbl)
+
+        desc_lbl = QLabel(solution.get('description', ''))
+        desc_lbl.setFont(Fonts.body(9))
+        desc_lbl.setWordWrap(True)
+        desc_lbl.setStyleSheet(f"color: {Colors.TEXT_SECONDARY}; background: transparent;")
+        text_col.addWidget(desc_lbl)
+
+        layout.addLayout(text_col, stretch=1)
+
+    def _apply_style(self, selected: bool):
+        if selected:
+            self.setStyleSheet(f"""
+                QFrame {{
+                    background-color: {Colors.PRIMARY_SURFACE};
+                    border: 2px solid {Colors.PRIMARY};
+                    border-radius: 8px;
+                }}
+            """)
+        else:
+            self.setStyleSheet(f"""
+                QFrame {{
+                    background-color: {Colors.SURFACE};
+                    border: 1.5px solid {Colors.BORDER};
+                    border-radius: 8px;
+                }}
+                QFrame:hover {{
+                    border-color: {Colors.PRIMARY};
+                    background-color: {Colors.BACKGROUND};
+                }}
+            """)
+
+    def set_selected(self, selected: bool):
+        self._is_selected = selected
+        self._apply_style(selected)
+
+    def mousePressEvent(self, event):
+        self.selected.emit(self._solution_id)
+        super().mousePressEvent(event)
+
+    def mouseDoubleClickEvent(self, event):
+        self.selected.emit(self._solution_id)
+        # Propaga para o dialog encontrar via parent
+        parent = self.parent()
+        while parent and not isinstance(parent, SolutionsDialog):
+            parent = parent.parent()
+        if parent:
+            parent.accept()
+
+    @property
+    def solution_id(self) -> str:
+        return self._solution_id
 
 
 class SolutionsDialog(QDialog):
-    """Dialog para seleção de soluções de troubleshooting"""
-    
+    """Dialog para selecionar uma solução de troubleshooting."""
+
     def __init__(self, solutions: list, parent=None):
-        """
-        Inicializa o dialog
-        
-        Args:
-            solutions: Lista de soluções disponíveis
-            parent: Widget pai
-        """
         super().__init__(parent)
-        self.solutions = solutions
-        self.selected_solution = None
-        self.init_ui()
-    
-    def init_ui(self):
-        """Inicializa a interface do dialog"""
+        self._solutions = solutions
+        self._selected_id = solutions[0]['id'] if solutions else None
+        self._cards: list = []
+        self._build_ui()
+
+    def _build_ui(self):
         self.setWindowTitle("Executar Solução")
-        self.setMinimumSize(500, 400)
-        self.resize(600, 500)
-        
-        # Layout principal
-        layout = QVBoxLayout()
-        layout.setSpacing(15)
-        self.setLayout(layout)
-        
-        # Título
-        title_label = QLabel("Selecione uma Solução")
-        title_font = QFont("Segoe UI", 16, QFont.Bold)
-        title_label.setFont(title_font)
-        title_label.setStyleSheet(f"color: {PRIMARY_COLOR}; padding: 10px;")
-        layout.addWidget(title_label)
-        
-        # Subtítulo
-        subtitle_label = QLabel(
-            "Escolha uma solução de troubleshooting abaixo para iniciar o wizard de diagnóstico:"
+        self.setMinimumSize(520, 380)
+        self.setModal(True)
+        self.setStyleSheet(f"QDialog {{ background-color: {Colors.SURFACE}; }}")
+
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+
+        # Header
+        header = QWidget()
+        header.setStyleSheet(
+            f"background-color: {Colors.BACKGROUND}; "
+            f"border-bottom: 1px solid {Colors.BORDER};"
         )
-        subtitle_label.setFont(QFont("Segoe UI", 10))
-        subtitle_label.setWordWrap(True)
-        subtitle_label.setStyleSheet("color: #666666; padding: 0 10px 10px 10px;")
-        layout.addWidget(subtitle_label)
-        
-        # Lista de soluções
-        self.solutions_list = QListWidget()
-        self.solutions_list.setFont(QFont("Segoe UI", 11))
-        self.solutions_list.setStyleSheet("""
-            QListWidget {
-                border: 1px solid #CCCCCC;
-                border-radius: 5px;
-                padding: 5px;
-                background-color: white;
-            }
-            QListWidget::item {
-                padding: 15px;
-                border-bottom: 1px solid #EEEEEE;
-            }
-            QListWidget::item:selected {
-                background-color: #E8F4F8;
-                color: #0078D4;
-            }
-            QListWidget::item:hover {
-                background-color: #F5F5F5;
-            }
-        """)
-        self.solutions_list.itemDoubleClicked.connect(self.on_item_double_clicked)
-        
-        # Adiciona soluções à lista
-        for solution in self.solutions:
-            item = QListWidgetItem()
-            
-            # Texto da solução com ícone
-            icon = solution.get('icon', '🔧')
-            name = solution.get('name', 'Solução sem nome')
-            description = solution.get('description', '')
-            
-            item_text = f"{icon}  {name}"
-            if description:
-                item_text += f"\n    {description}"
-            
-            item.setText(item_text)
-            item.setData(Qt.UserRole, solution['id'])
-            
-            self.solutions_list.addItem(item)
-        
-        # Seleciona primeiro item por padrão
-        if self.solutions_list.count() > 0:
-            self.solutions_list.setCurrentRow(0)
-        
-        layout.addWidget(self.solutions_list)
-        
-        # Botões
-        button_layout = QHBoxLayout()
-        button_layout.setSpacing(10)
-        
-        # Botão Cancelar
-        cancel_button = QPushButton("Cancelar")
-        cancel_button.setFont(QFont("Segoe UI", 10))
-        cancel_button.setMinimumHeight(40)
-        cancel_button.setMinimumWidth(120)
-        cancel_button.setStyleSheet("""
-            QPushButton {
-                background-color: #F0F0F0;
-                color: #333333;
-                border: 1px solid #CCCCCC;
-                border-radius: 5px;
-                padding: 8px;
-            }
-            QPushButton:hover {
-                background-color: #E0E0E0;
-            }
-        """)
-        cancel_button.clicked.connect(self.reject)
-        button_layout.addWidget(cancel_button)
-        
-        button_layout.addStretch()
-        
-        # Botão Executar
-        execute_button = QPushButton("Executar")
-        execute_button.setFont(QFont("Segoe UI", 10, QFont.Bold))
-        execute_button.setMinimumHeight(40)
-        execute_button.setMinimumWidth(120)
-        execute_button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {PRIMARY_COLOR};
-                color: white;
-                border: none;
-                border-radius: 5px;
-                padding: 8px;
-            }}
-            QPushButton:hover {{
-                background-color: #005A9E;
-            }}
-            QPushButton:pressed {{
-                background-color: #004578;
-            }}
-        """)
-        execute_button.clicked.connect(self.on_execute)
-        button_layout.addWidget(execute_button)
-        
-        layout.addLayout(button_layout)
-    
-    def on_item_double_clicked(self, item):
-        """Callback quando item é clicado duas vezes"""
-        self.on_execute()
-    
-    def on_execute(self):
-        """Callback quando botão executar é clicado"""
-        current_item = self.solutions_list.currentItem()
-        
-        if current_item:
-            self.selected_solution = current_item.data(Qt.UserRole)
-            self.accept()
-    
+        hl = QVBoxLayout(header)
+        hl.setContentsMargins(28, 22, 28, 22)
+        hl.setSpacing(4)
+
+        title = QLabel("Executar Solução")
+        title.setFont(Fonts.heading(14))
+        title.setStyleSheet(f"color: {Colors.TEXT_PRIMARY}; background: transparent;")
+        hl.addWidget(title)
+
+        subtitle = BodyLabel("Selecione um wizard de diagnóstico guiado para iniciar.")
+        subtitle.setStyleSheet(f"color: {Colors.TEXT_SECONDARY}; background: transparent;")
+        hl.addWidget(subtitle)
+
+        root.addWidget(header)
+
+        # Área de cards
+        cards_widget = QWidget()
+        cards_widget.setStyleSheet(f"background-color: {Colors.SURFACE};")
+        cards_layout = QVBoxLayout(cards_widget)
+        cards_layout.setContentsMargins(24, 20, 24, 20)
+        cards_layout.setSpacing(10)
+
+        for solution in self._solutions:
+            card = SolutionCard(solution)
+            card.selected.connect(self._on_card_selected)
+            self._cards.append(card)
+            cards_layout.addWidget(card)
+
+        cards_layout.addStretch()
+
+        # Pré-seleciona o primeiro
+        if self._cards:
+            self._cards[0].set_selected(True)
+
+        root.addWidget(cards_widget, stretch=1)
+
+        # Footer com botões
+        footer = QWidget()
+        footer.setStyleSheet(
+            f"background-color: {Colors.BACKGROUND}; "
+            f"border-top: 1px solid {Colors.BORDER};"
+        )
+        fl = QHBoxLayout(footer)
+        fl.setContentsMargins(24, 14, 24, 14)
+        fl.setSpacing(10)
+
+        cancel_btn = SecondaryButton("Cancelar")
+        cancel_btn.setMinimumWidth(110)
+        cancel_btn.clicked.connect(self.reject)
+        fl.addWidget(cancel_btn)
+
+        fl.addStretch()
+
+        execute_btn = PrimaryButton("Executar Solução")
+        execute_btn.setMinimumWidth(150)
+        execute_btn.clicked.connect(self.accept)
+        fl.addWidget(execute_btn)
+
+        root.addWidget(footer)
+
+    def _on_card_selected(self, solution_id: str):
+        self._selected_id = solution_id
+        for card in self._cards:
+            card.set_selected(card.solution_id == solution_id)
+
     def get_selected_solution(self) -> str:
-        """
-        Retorna o ID da solução selecionada
-        
-        Returns:
-            ID da solução ou None se nenhuma foi selecionada
-        """
-        return self.selected_solution
+        return self._selected_id
+

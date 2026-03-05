@@ -1,18 +1,24 @@
 """
-Janela principal da aplicação
+Janela principal da aplicação — arquitetura MVVM-inspirada.
+A View é responsável apenas pela UI; a lógica de negócios fica nos serviços.
 """
 import sys
 from pathlib import Path
-from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
-                             QPushButton, QLabel, QMessageBox, QAction, QDialog)
+from PyQt5.QtWidgets import (
+    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QAction, QSizePolicy, QDialog,
+)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 
-# Adiciona o diretório raiz ao path
 ROOT_DIR = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from config import APP_NAME, APP_VERSION, PRIMARY_COLOR, SUCCESS_COLOR
+from config import APP_NAME, APP_VERSION
+from common.theme import Colors, Fonts
+from common.widgets import (
+    Card, HeaderBar, PrimaryButton, SuccessButton,
+    BodyLabel, HeadingLabel,
+)
 from common.services.logger import logger_service
 from common.services.solutions_service import solutions_service
 from modules.checkup.threads.checkup_thread import CheckupThread
@@ -20,14 +26,299 @@ from common.views.dialogs import ResultDialogs
 from common.views.solutions_dialog import SolutionsDialog
 
 
+class ActionCard(Card):
+    """Card de ação única com ícone, título, descrição e botão."""
+
+    def __init__(
+        self,
+        icon: str,
+        title: str,
+        description: str,
+        button_text: str,
+        button_style: str = 'primary',
+        parent=None,
+    ):
+        super().__init__(parent)
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(28, 26, 28, 26)
+        layout.setSpacing(10)
+
+        icon_lbl = QLabel(icon)
+        icon_lbl.setFont(Fonts.title(26))
+        icon_lbl.setStyleSheet("background: transparent; border: none;")
+        layout.addWidget(icon_lbl)
+
+        title_lbl = QLabel(title)
+        title_lbl.setFont(Fonts.heading(14))
+        title_lbl.setStyleSheet(
+            f"color: {Colors.TEXT_PRIMARY}; background: transparent; border: none;"
+        )
+        layout.addWidget(title_lbl)
+
+        desc_lbl = BodyLabel(description)
+        desc_lbl.setStyleSheet(
+            f"color: {Colors.TEXT_SECONDARY}; background: transparent; border: none;"
+        )
+        layout.addWidget(desc_lbl)
+
+        layout.addStretch()
+
+        self.button = (
+            SuccessButton(button_text)
+            if button_style == 'success'
+            else PrimaryButton(button_text)
+        )
+        self.button.setMinimumHeight(42)
+        layout.addWidget(self.button)
+
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+
 class MainWindow(QMainWindow):
-    """Janela principal da aplicação"""
-    
+    """Janela principal da aplicação."""
+
     def __init__(self):
         super().__init__()
         self.logger = logger_service.get_logger('MainWindow')
         self.checkup_thread = None
-        self.init_ui()
+        self._build_ui()
+        self._build_menu()
+
+    # ------------------------------------------------------------------
+    # Construção da UI
+    # ------------------------------------------------------------------
+
+    def _build_ui(self):
+        self.setWindowTitle(f"{APP_NAME} v{APP_VERSION}")
+        self.setGeometry(100, 100, 880, 580)
+        self.setMinimumSize(720, 500)
+
+        root = QWidget()
+        root.setStyleSheet(f"background-color: {Colors.BACKGROUND};")
+        self.setCentralWidget(root)
+
+        root_layout = QVBoxLayout(root)
+        root_layout.setContentsMargins(0, 0, 0, 0)
+        root_layout.setSpacing(0)
+
+        # Header
+        root_layout.addWidget(HeaderBar(APP_NAME, "Sistema de Automação de Suporte"))
+
+        # Área de conteúdo
+        content_wrapper = QWidget()
+        content_wrapper.setStyleSheet(f"background-color: {Colors.BACKGROUND};")
+        content_layout = QVBoxLayout(content_wrapper)
+        content_layout.setContentsMargins(32, 28, 32, 28)
+        content_layout.setSpacing(20)
+
+        welcome = QLabel("O que você quer fazer hoje?")
+        welcome.setFont(Fonts.subheading(11))
+        welcome.setStyleSheet(f"color: {Colors.TEXT_SECONDARY}; background: transparent;")
+        content_layout.addWidget(welcome)
+
+        # Cards de ação
+        cards_layout = QHBoxLayout()
+        cards_layout.setSpacing(20)
+
+        self._checkup_card = ActionCard(
+            icon="🔍",
+            title="Rodar Checkup",
+            description=(
+                "Verifica o estado atual do sistema e corrige "
+                "problemas automaticamente, como papel de parede incorreto."
+            ),
+            button_text="Iniciar Checkup",
+            button_style='primary',
+        )
+        self._checkup_card.button.clicked.connect(self._run_checkup)
+        cards_layout.addWidget(self._checkup_card)
+
+        self._solutions_card = ActionCard(
+            icon="🔧",
+            title="Executar Solução",
+            description=(
+                "Selecione um wizard de diagnóstico guiado para "
+                "resolver problemas de rede, impressora e outros."
+            ),
+            button_text="Ver Soluções",
+            button_style='success',
+        )
+        self._solutions_card.button.clicked.connect(self._show_solutions)
+        cards_layout.addWidget(self._solutions_card)
+
+        content_layout.addLayout(cards_layout)
+        content_layout.addStretch()
+        root_layout.addWidget(content_wrapper, stretch=1)
+
+        # Rodapé de status
+        root_layout.addWidget(self._build_footer())
+
+        self.logger.info(f"Aplicação iniciada — versão {APP_VERSION}")
+
+    def _build_footer(self) -> QWidget:
+        footer = QWidget()
+        footer.setFixedHeight(40)
+        footer.setStyleSheet(f"""
+            QWidget {{
+                background-color: {Colors.SURFACE};
+                border-top: 1px solid {Colors.BORDER};
+            }}
+        """)
+        layout = QHBoxLayout(footer)
+        layout.setContentsMargins(16, 0, 16, 0)
+        layout.setSpacing(6)
+
+        self._status_dot = QLabel("●")
+        self._status_dot.setStyleSheet(
+            f"color: {Colors.SUCCESS}; background: transparent; border: none;"
+        )
+        layout.addWidget(self._status_dot)
+
+        self._status_label = QLabel("Pronto")
+        self._status_label.setFont(Fonts.caption(9))
+        self._status_label.setStyleSheet(
+            f"color: {Colors.TEXT_SECONDARY}; background: transparent; border: none;"
+        )
+        layout.addWidget(self._status_label)
+
+        layout.addStretch()
+
+        version_label = QLabel(f"v{APP_VERSION}")
+        version_label.setFont(Fonts.caption(9))
+        version_label.setStyleSheet(
+            f"color: {Colors.TEXT_MUTED}; background: transparent; border: none;"
+        )
+        layout.addWidget(version_label)
+        return footer
+
+    def _build_menu(self):
+        menubar = self.menuBar()
+        config_menu = menubar.addMenu('Configurações')
+        about_action = QAction('Sobre', self)
+        about_action.triggered.connect(self._show_about)
+        config_menu.addAction(about_action)
+
+    # ------------------------------------------------------------------
+    # Controle de status
+    # ------------------------------------------------------------------
+
+    def _set_status(self, text: str, state: str = 'idle'):
+        """Atualiza o indicador de status no rodapé. state: idle|running|ok|error"""
+        dot_colors = {
+            'idle':    Colors.TEXT_MUTED,
+            'running': Colors.WARNING,
+            'ok':      Colors.SUCCESS,
+            'error':   Colors.DANGER,
+        }
+        color = dot_colors.get(state, Colors.TEXT_MUTED)
+        self._status_dot.setStyleSheet(
+            f"color: {color}; background: transparent; border: none;"
+        )
+        self._status_label.setText(text)
+
+    # ------------------------------------------------------------------
+    # Ações
+    # ------------------------------------------------------------------
+
+    def _show_about(self):
+        from common.views.dialogs import AboutDialog
+        AboutDialog(APP_NAME, APP_VERSION, self).exec_()
+
+    def _run_checkup(self):
+        self.logger.info("Iniciando checkup do sistema...")
+        self._checkup_card.button.setEnabled(False)
+        self._solutions_card.button.setEnabled(False)
+        self._set_status("Executando checkup...", 'running')
+
+        self.checkup_thread = CheckupThread(auto_fix=True)
+        self.checkup_thread.finished.connect(self._on_checkup_finished)
+        self.checkup_thread.start()
+
+    def _on_checkup_finished(self, result: dict):
+        self._checkup_card.button.setEnabled(True)
+        self._solutions_card.button.setEnabled(True)
+
+        if 'error' in result:
+            self.logger.error(f"Erro durante checkup: {result['error']}")
+            self._set_status("Erro no checkup", 'error')
+            ResultDialogs.show_error(self, result['error'])
+            return
+
+        issues = result.get('issues_found', 0)
+        fixes = result.get('fixes_applied', {})
+        checks = result.get('checks', [])
+
+        self.logger.info(f"Checkup concluído — {issues} problema(s)")
+
+        if issues == 0:
+            self._set_status("Sistema OK", 'ok')
+            ResultDialogs.show_success(self)
+        else:
+            self._set_status(f"Checkup concluído — {issues} problema(s)", 'error')
+            ResultDialogs.show_issues(self, checks, fixes)
+
+    def _show_solutions(self):
+        try:
+            self.logger.info("Abrindo menu de soluções...")
+            solutions = solutions_service.get_available_solutions()
+
+            if not solutions:
+                ResultDialogs.show_info(
+                    self,
+                    "Nenhuma solução disponível",
+                    "Nenhuma solução de troubleshooting está disponível no momento.",
+                )
+                return
+
+            dialog = SolutionsDialog(solutions, self)
+            if dialog.exec_() == QDialog.Accepted:
+                selected_id = dialog.get_selected_solution()
+                if not selected_id:
+                    return
+
+                self.logger.info(f"Executando solução: {selected_id}")
+                self._set_status("Executando solução...", 'running')
+                from PyQt5.QtWidgets import QApplication
+                QApplication.processEvents()
+
+                success = solutions_service.execute_solution(selected_id)
+
+                if success:
+                    self._set_status("Solução executada com sucesso", 'ok')
+                    if selected_id == 'wallpaper_fix':
+                        ResultDialogs.show_info(
+                            self,
+                            "Papel de Parede Atualizado",
+                            "O papel de parede foi gerado e configurado com sucesso!\n"
+                            "As informações do sistema estão visíveis na tela.",
+                            "🖼️",
+                        )
+                else:
+                    self._set_status("Erro ao executar solução", 'error')
+                    if selected_id == 'wallpaper_fix':
+                        ResultDialogs.show_error(
+                            self,
+                            "Não foi possível gerar ou configurar o papel de parede.\n"
+                            "Verifique os logs para mais detalhes.",
+                        )
+                    elif selected_id != 'network_troubleshoot':
+                        ResultDialogs.show_error(
+                            self,
+                            "Não foi possível executar a solução.\n"
+                            "Verifique os logs para mais detalhes.",
+                        )
+            else:
+                self._set_status("Pronto")
+
+        except Exception as e:
+            self.logger.error(f"Erro ao abrir menu de soluções: {e}")
+            ResultDialogs.show_error(self, str(e))
+
+    def closeEvent(self, event):
+        self.logger.info("Encerrando aplicação...")
+        event.accept()
+
+
     
     def init_ui(self):
         """Inicializa a interface"""

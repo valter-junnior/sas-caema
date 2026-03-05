@@ -1,22 +1,12 @@
-# Tarefas Concluídas - SAS-Caema
+analise todo o projeto em /app e melhore o visual se preciso use padrão DRY MVVM ou outra arquitetura para facilitar a implementação da aplicação refatore pro completo a aplicação em /app alterando:
 
-## ✅ Módulo de Verificação de Cabos de Rede
-- Implementação completa do wizard passo-a-passo
-- 5 etapas interativas de troubleshooting
-- Teste automático de conectividade
-- Integrado ao botão "Executar Solução"
+arquitetura boa para aplicações desktop
+melhorando bastante o visual (para ficar algo meio tipo que fazemos na web):
+refatorando codigo para ser um bom codigo clean code
 
-## ✅ Correção do Timer da Etapa 4
-- Removido timer de 2 minutos que atrapalhava o fluxo
-- Navegação natural e livre para o usuário
+tome cuidado com:
 
-## ✅ Corrigir Papel de Parede no Menu Soluções
-- Adicionado "Corrigir Papel de Parede" ao menu "Executar Solução"
-- Executa diretamente sem wizard (diferente da verificação de cabos)
-- Feedback visual com QMessageBox informando sucesso/erro
-- Ícone: 🖼️
+arquivos que são utilizados no /build /installer
 
-### Implementação
-- WallpaperModule registrado no SolutionsService
-- Mensagens específicas de sucesso/erro no MainWindow
-- Processamento assíncrono de eventos para atualizar UI durante execução
+se preciso analise a documentacao.md
+e os utils.md

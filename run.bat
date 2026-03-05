@@ -18,5 +18,4 @@ if errorlevel 1 (
 
 :: Executa a aplicação
 echo Iniciando aplicacao...
-cd app
-python app.py
+python app/app.py

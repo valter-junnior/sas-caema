@@ -1,19 +1,20 @@
 """
-Janela de feedback visual para checkup na inicialização
-Exibe progresso em tempo real no canto inferior direito
+Janela de feedback visual para checkup na inicialização.
+Exibe progresso em tempo real no canto inferior direito com animação.
 """
 import sys
 from pathlib import Path
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout, QLabel, QProgressBar, 
-                             QPushButton, QApplication, QGraphicsDropShadowEffect)
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QProgressBar,
+    QPushButton, QApplication, QGraphicsDropShadowEffect,
+)
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QRect, pyqtSignal
 from PyQt5.QtGui import QFont, QColor
 
-# Adiciona o diretório raiz ao path
 ROOT_DIR = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from config import PRIMARY_COLOR, SUCCESS_COLOR, ERROR_COLOR
+from common.theme import Colors, Fonts
 
 
 class StartupFeedbackWindow(QWidget):
@@ -83,8 +84,7 @@ class StartupFeedbackWindow(QWidget):
         
         # Título - altura fixa maior
         self.title_label = QLabel("SAS-Caema")
-        title_font = QFont("Segoe UI", 16, QFont.Bold)
-        self.title_label.setFont(title_font)
+        self.title_label.setFont(Fonts.heading(16))
         self.title_label.setAlignment(Qt.AlignCenter)
         self.title_label.setFixedSize(380, 40)
         self.title_label.setScaledContents(False)
@@ -96,8 +96,7 @@ class StartupFeedbackWindow(QWidget):
         # Mensagem de status - SEM WordWrap para evitar expansão
         # self.status_label = QLabel("Iniciando verificação...")
         self.status_label = QLabel("Corrigindo problemas encontrados...")
-        status_font = QFont("Segoe UI", 11)
-        self.status_label.setFont(status_font)
+        self.status_label.setFont(Fonts.subheading(11))
         self.status_label.setAlignment(Qt.AlignCenter)
         self.status_label.setWordWrap(False)
         self.status_label.setFixedSize(380, 65)
@@ -121,8 +120,7 @@ class StartupFeedbackWindow(QWidget):
         
         # Detalhes (módulo atual) - altura fixa
         self.detail_label = QLabel("")
-        detail_font = QFont("Segoe UI", 9)
-        self.detail_label.setFont(detail_font)
+        self.detail_label.setFont(Fonts.caption(9))
         self.detail_label.setAlignment(Qt.AlignCenter)
         self.detail_label.setFixedSize(380, 35)
         self.detail_label.setScaledContents(False)
@@ -131,7 +129,7 @@ class StartupFeedbackWindow(QWidget):
         main_layout.addLayout(content_layout)
         
         # Estilo padrão
-        self.update_style(PRIMARY_COLOR)
+        self.update_style(Colors.PRIMARY)
         
     def update_style(self, color):
         """Atualiza o estilo da janela com a cor especificada"""
@@ -170,15 +168,15 @@ class StartupFeedbackWindow(QWidget):
         """)
         
         # Estilo para status
-        self.status_label.setStyleSheet("""
-            color: #2c3e50;
+        self.status_label.setStyleSheet(f"""
+            color: {Colors.TEXT_PRIMARY};
             background-color: transparent;
             border: none;
         """)
         
         # Estilo para detalhes
-        self.detail_label.setStyleSheet("""
-            color: #7f8c8d;
+        self.detail_label.setStyleSheet(f"""
+            color: {Colors.TEXT_MUTED};
             background-color: transparent;
             border: none;
         """)
@@ -251,7 +249,7 @@ class StartupFeedbackWindow(QWidget):
         """
         # self.set_status("Verificando sistema...", progress)
         # self.set_detail(f"Analisando: {module_name}")
-        self.update_style(PRIMARY_COLOR)
+        self.update_style(Colors.PRIMARY)
     
     def show_fixing(self, module_name: str, progress: int):
         """
@@ -261,9 +259,7 @@ class StartupFeedbackWindow(QWidget):
             module_name: Nome do módulo
             progress: Progresso atual (0-100)
         """
-        # self.set_status("Aplicando correções...", progress)
-        # self.set_detail(f"Corrigindo: {module_name}")
-        self.update_style("#FF8C00")  # Laranja
+        self.update_style(Colors.WARNING)
     
     def show_success(self, message: str = "Sistema verificado com sucesso"):
         """
@@ -274,7 +270,7 @@ class StartupFeedbackWindow(QWidget):
         """
         self.set_status(message, 100)
         self.set_detail("Sua máquina está funcionando perfeitamente")
-        self.update_style(SUCCESS_COLOR)
+        self.update_style(Colors.SUCCESS)
         
         # Fecha automaticamente após 10 segundos
         QTimer.singleShot(10000, self.close_with_animation)
@@ -288,7 +284,7 @@ class StartupFeedbackWindow(QWidget):
         """
         self.set_status(message, 100)
         self.set_detail("Verifique os logs para mais detalhes")
-        self.update_style(ERROR_COLOR)
+        self.update_style(Colors.DANGER)
         
         # Fecha automaticamente após 15 segundos
         QTimer.singleShot(15000, self.close_with_animation)
@@ -303,7 +299,7 @@ class StartupFeedbackWindow(QWidget):
         """
         self.set_status(f"{fixed} de {total} problemas foram corrigidos", 100)
         self.set_detail("Alguns problemas requerem atenção manual")
-        self.update_style("#FF8C00")
+        self.update_style(Colors.WARNING)
         
         # Fecha automaticamente após 13 segundos
         QTimer.singleShot(13000, self.close_with_animation)

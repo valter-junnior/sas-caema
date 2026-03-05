@@ -77,6 +77,8 @@ def build_main_exe(root_dir, app_dir, dist_dir, build_dir):
         "--hidden-import=PIL.ImageDraw",
         "--hidden-import=PIL.ImageFont",
         "--hidden-import=psutil",
+        "--hidden-import=common.theme",
+        "--hidden-import=common.widgets",
         
         # Arquivo principal
         str(app_dir / "app.py"),
@@ -143,6 +145,8 @@ def build_startup_exe(root_dir, app_dir, dist_dir, build_dir):
         "--hidden-import=PIL.ImageDraw",
         "--hidden-import=PIL.ImageFont",
         "--hidden-import=psutil",
+        "--hidden-import=common.theme",
+        "--hidden-import=common.widgets",
         
         # Arquivo de startup
         str(app_dir / "modules" / "checkup" / "startup" / "main.py"),
