@@ -1,6 +1,6 @@
 """
-Janela de feedback visual para checkup na inicialização.
-Exibe progresso em tempo real no canto inferior direito com animação.
+Janela de feedback do checkup automático na inicialização.
+Toast moderno no canto inferior direito — visual sincronizado com o app.
 """
 import sys
 from pathlib import Path
@@ -9,322 +9,262 @@ from PyQt5.QtWidgets import (
     QPushButton, QApplication, QGraphicsDropShadowEffect,
 )
 from PyQt5.QtCore import Qt, QTimer, QPropertyAnimation, QRect, pyqtSignal
-from PyQt5.QtGui import QFont, QColor
+from PyQt5.QtGui import QColor
 
 ROOT_DIR = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from common.theme import Colors, Fonts
 
+# ── Constantes ─────────────────────────────────────────────────────────────
+_W, _H      = 440, 250
+_MARGIN     = 20
+_TASKBAR    = 56  # altura estimada da barra de tarefas do Windows
+
+_CLOSE_SUCCESS = 8_000   # ms
+_CLOSE_PARTIAL = 12_000
+_CLOSE_ERROR   = 15_000
+
 
 class StartupFeedbackWindow(QWidget):
-    """
-    Janela de feedback visual para o checkup na inicialização do Windows.
-    Aparece no canto inferior direito com animação.
-    """
-    
+    """Toast de feedback do checkup automático na inicialização do Windows."""
+
     closed = pyqtSignal()
-    
+
+    # ── Ciclo de vida ──────────────────────────────────────────────────────
+
     def __init__(self):
         super().__init__()
-        self.setWindowFlags(
-            Qt.WindowStaysOnTopHint | 
-            Qt.FramelessWindowHint |
-            Qt.Tool
-        )
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint | Qt.Tool)
         self.setAttribute(Qt.WA_TranslucentBackground, False)
-        
-        self.init_ui()
-        self.add_shadow()
-        self.position_window()
-        
-    def init_ui(self):
-        """Inicializa a interface"""
-        # Janela maior para evitar sobreposições
-        self.setFixedSize(450, 320)
-        
-        # Layout principal
-        main_layout = QVBoxLayout()
-        main_layout.setContentsMargins(0, 0, 0, 0)
-        main_layout.setSpacing(0)
-        self.setLayout(main_layout)
-        
-        # Header com botão fechar
-        header_layout = QHBoxLayout()
-        header_layout.setContentsMargins(0, 10, 10, 0)
-        header_layout.addStretch()
-        
-        # Botão fechar
-        self.close_button = QPushButton("×")
-        self.close_button.setFixedSize(32, 32)
-        self.close_button.setCursor(Qt.PointingHandCursor)
-        self.close_button.clicked.connect(self.close_with_animation)
-        self.close_button.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                border: none;
-                color: #95a5a6;
-                font-size: 28px;
-                font-weight: normal;
-                border-radius: 16px;
-                padding-bottom: 4px;
-            }
-            QPushButton:hover {
-                background-color: #ecf0f1;
-                color: #e74c3c;
-            }
+        self.setFixedSize(_W, _H)
+        self._build_ui()
+        self._apply_shadow()
+        self._position()
+
+    # ── UI ─────────────────────────────────────────────────────────────────
+
+    def _build_ui(self):
+        root = QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+        root.addWidget(self._make_header())
+        root.addWidget(self._make_body(), stretch=1)
+        root.addWidget(self._make_strip())
+
+    def _make_header(self):
+        header = QWidget()
+        header.setObjectName("sfHeader")
+        header.setFixedHeight(52)
+        header.setStyleSheet(f"""
+            QWidget#sfHeader {{
+                background-color: {Colors.HEADER_BG};
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+            }}
         """)
-        header_layout.addWidget(self.close_button, 0, Qt.AlignTop)
-        main_layout.addLayout(header_layout)
-        
-        # Container de conteúdo - mais espaçamento
-        content_layout = QVBoxLayout()
-        content_layout.setContentsMargins(35, 10, 35, 35)
-        content_layout.setSpacing(0)
-        
-        # Título - altura fixa maior
-        self.title_label = QLabel("SAS-Caema")
-        self.title_label.setFont(Fonts.heading(16))
-        self.title_label.setAlignment(Qt.AlignCenter)
-        self.title_label.setFixedSize(380, 40)
-        self.title_label.setScaledContents(False)
-        content_layout.addWidget(self.title_label, 0, Qt.AlignHCenter)
-        
-        # Espaço fixo
-        content_layout.addSpacing(18)
-        
-        # Mensagem de status - SEM WordWrap para evitar expansão
-        # self.status_label = QLabel("Iniciando verificação...")
-        self.status_label = QLabel("Corrigindo problemas encontrados...")
-        self.status_label.setFont(Fonts.subheading(11))
-        self.status_label.setAlignment(Qt.AlignCenter)
-        self.status_label.setWordWrap(False)
-        self.status_label.setFixedSize(380, 65)
-        self.status_label.setScaledContents(False)
-        content_layout.addWidget(self.status_label, 0, Qt.AlignHCenter)
-        
-        # Espaço fixo
-        content_layout.addSpacing(22)
-        
-        # Barra de progresso - altura fixa
-        self.progress_bar = QProgressBar()
-        self.progress_bar.setMinimum(0)
-        self.progress_bar.setMaximum(100)
-        self.progress_bar.setValue(0)
-        self.progress_bar.setTextVisible(False)
-        self.progress_bar.setFixedSize(380, 12)
-        content_layout.addWidget(self.progress_bar, 0, Qt.AlignHCenter)
-        
-        # Espaço fixo
-        content_layout.addSpacing(22)
-        
-        # Detalhes (módulo atual) - altura fixa
-        self.detail_label = QLabel("")
-        self.detail_label.setFont(Fonts.caption(9))
-        self.detail_label.setAlignment(Qt.AlignCenter)
-        self.detail_label.setFixedSize(380, 35)
-        self.detail_label.setScaledContents(False)
-        content_layout.addWidget(self.detail_label, 0, Qt.AlignHCenter)
-        
-        main_layout.addLayout(content_layout)
-        
-        # Estilo padrão
-        self.update_style(Colors.PRIMARY)
-        
-    def update_style(self, color):
-        """Atualiza o estilo da janela com a cor especificada"""
-        self.setStyleSheet(f"""
-            QWidget {{
-                background-color: #ffffff;
-                border: 3px solid {color};
-                border-radius: 20px;
-            }}
-            QLabel {{
-                background-color: transparent;
-                border: none;
-            }}
+
+        layout = QHBoxLayout(header)
+        layout.setContentsMargins(20, 0, 12, 0)
+        layout.setSpacing(0)
+
+        title = QLabel("SAS-Caema  —  Verificação Automática")
+        title.setFont(Fonts.heading(10))
+        title.setStyleSheet(f"color: {Colors.HEADER_TEXT}; background: transparent;")
+        layout.addWidget(title, stretch=1)
+
+        btn = QPushButton("✕")
+        btn.setFixedSize(28, 28)
+        btn.setCursor(Qt.PointingHandCursor)
+        btn.clicked.connect(self._dismiss)
+        btn.setStyleSheet(f"""
             QPushButton {{
-                background-color: transparent;
+                background: transparent;
                 border: none;
+                color: {Colors.HEADER_SUBTITLE};
+                font-size: 13px;
+                border-radius: 14px;
             }}
+            QPushButton:hover {{
+                background: {Colors.HEADER_SURFACE};
+                color: {Colors.DANGER};
+            }}
+        """)
+        layout.addWidget(btn)
+        return header
+
+    def _make_body(self):
+        body = QWidget()
+        body.setObjectName("sfBody")
+        body.setStyleSheet(f"QWidget#sfBody {{ background-color: {Colors.SURFACE}; }}")
+
+        layout = QVBoxLayout(body)
+        layout.setContentsMargins(24, 18, 24, 20)
+        layout.setSpacing(0)
+
+        self._status_lbl = QLabel("Iniciando verificação do sistema...")
+        self._status_lbl.setFont(Fonts.subheading(11))
+        self._status_lbl.setWordWrap(True)
+        self._status_lbl.setStyleSheet(
+            f"color: {Colors.TEXT_PRIMARY}; background: transparent;"
+        )
+        layout.addWidget(self._status_lbl)
+
+        layout.addSpacing(4)
+
+        self._detail_lbl = QLabel("")
+        self._detail_lbl.setFont(Fonts.caption(9))
+        self._detail_lbl.setWordWrap(True)
+        self._detail_lbl.setStyleSheet(
+            f"color: {Colors.TEXT_MUTED}; background: transparent;"
+        )
+        layout.addWidget(self._detail_lbl)
+
+        layout.addSpacing(16)
+
+        self._progress = QProgressBar()
+        self._progress.setRange(0, 100)
+        self._progress.setValue(0)
+        self._progress.setTextVisible(False)
+        self._progress.setFixedHeight(8)
+        self._set_progress_color(Colors.PRIMARY)
+        layout.addWidget(self._progress)
+
+        layout.addSpacing(12)
+
+        self._phase_lbl = QLabel("Aguarde...")
+        self._phase_lbl.setFont(Fonts.caption(9))
+        self._phase_lbl.setStyleSheet(
+            f"color: {Colors.PRIMARY}; background: transparent;"
+        )
+        layout.addWidget(self._phase_lbl)
+
+        return body
+
+    def _make_strip(self):
+        self._strip = QWidget()
+        self._strip.setFixedHeight(4)
+        self._strip.setStyleSheet(f"""
+            background-color: {Colors.PRIMARY};
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        """)
+        return self._strip
+
+    # ── Helpers visuais ────────────────────────────────────────────────────
+
+    def _set_progress_color(self, color: str):
+        self._progress.setStyleSheet(f"""
             QProgressBar {{
                 border: none;
-                border-radius: 5px;
-                background-color: #f5f5f5;
-                text-align: center;
+                border-radius: 4px;
+                background-color: {Colors.BORDER};
             }}
             QProgressBar::chunk {{
                 background-color: {color};
-                border-radius: 5px;
+                border-radius: 4px;
             }}
         """)
-        
-        # Estilo especial para título
-        self.title_label.setStyleSheet(f"""
-            color: {color};
-            background-color: transparent;
-            border: none;
-            font-weight: bold;
+
+    def _set_accent(self, color: str):
+        self._set_progress_color(color)
+        self._strip.setStyleSheet(f"""
+            background-color: {color};
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
         """)
-        
-        # Estilo para status
-        self.status_label.setStyleSheet(f"""
-            color: {Colors.TEXT_PRIMARY};
-            background-color: transparent;
-            border: none;
-        """)
-        
-        # Estilo para detalhes
-        self.detail_label.setStyleSheet(f"""
-            color: {Colors.TEXT_MUTED};
-            background-color: transparent;
-            border: none;
-        """)
-        
-        # Reaplica estilo do botão fechar para não ser sobrescrito
-        self.close_button.setStyleSheet("""
-            QPushButton {
-                background-color: transparent;
-                border: none;
-                color: #95a5a6;
-                font-size: 28px;
-                font-weight: normal;
-                border-radius: 16px;
-                padding-bottom: 4px;
-            }
-            QPushButton:hover {
-                background-color: #ecf0f1;
-                color: #e74c3c;
-            }
-        """)
-    
-    def add_shadow(self):
-        """Adiciona sombra suave à janela"""
-        shadow = QGraphicsDropShadowEffect()
-        shadow.setBlurRadius(30)
+
+    def _apply_shadow(self):
+        shadow = QGraphicsDropShadowEffect(self)
+        shadow.setBlurRadius(32)
         shadow.setXOffset(0)
-        shadow.setYOffset(5)
-        shadow.setColor(QColor(0, 0, 0, 80))
+        shadow.setYOffset(6)
+        shadow.setColor(QColor(0, 0, 0, 90))
         self.setGraphicsEffect(shadow)
-    
-    def position_window(self):
-        """Posiciona a janela no canto inferior direito"""
+
+    def _position(self):
         screen = QApplication.desktop().screenGeometry()
-        
-        # Margem de 20px das bordas
-        x = screen.width() - self.width() - 20
-        y = screen.height() - self.height() - 60  # 60px para barra de tarefas
-        
-        self.move(x, y)
-    
-    def set_status(self, message: str, progress: int = None):
-        """
-        Atualiza a mensagem de status
-        
-        Args:
-            message: Mensagem a exibir
-            progress: Progresso de 0-100 (opcional)
-        """
-        self.status_label.setText(message)
-        
-        if progress is not None:
-            self.progress_bar.setValue(progress)
-    
-    def set_detail(self, detail: str):
-        """
-        Atualiza o detalhe/módulo atual
-        
-        Args:
-            detail: Texto do detalhe
-        """
-        self.detail_label.setText(detail)
-    
+        self.move(screen.width() - _W - _MARGIN, screen.height() - _H - _TASKBAR)
+
+    # ── Slots públicos (conectados à thread) ───────────────────────────────
+
     def show_checking(self, module_name: str, progress: int):
-        """
-        Mostra que está verificando um módulo
-        
-        Args:
-            module_name: Nome do módulo
-            progress: Progresso atual (0-100)
-        """
-        # self.set_status("Verificando sistema...", progress)
-        # self.set_detail(f"Analisando: {module_name}")
-        self.update_style(Colors.PRIMARY)
-    
+        """Fase 1 — verificação em andamento."""
+        self._status_lbl.setText("Verificando sistema...")
+        self._detail_lbl.setText(f"Analisando: {module_name}")
+        self._progress.setValue(progress)
+        self._phase_lbl.setText("🔍  Fase 1 de 2 — Verificação")
+        self._phase_lbl.setStyleSheet(
+            f"color: {Colors.PRIMARY}; background: transparent;"
+        )
+        self._set_accent(Colors.PRIMARY)
+
     def show_fixing(self, module_name: str, progress: int):
-        """
-        Mostra que está corrigindo um problema
-        
-        Args:
-            module_name: Nome do módulo
-            progress: Progresso atual (0-100)
-        """
-        self.update_style(Colors.WARNING)
-    
-    def show_success(self, message: str = "Sistema verificado com sucesso"):
-        """
-        Mostra mensagem de sucesso
-        
-        Args:
-            message: Mensagem de sucesso
-        """
-        self.set_status(message, 100)
-        self.set_detail("Sua máquina está funcionando perfeitamente")
-        self.update_style(Colors.SUCCESS)
-        
-        # Fecha automaticamente após 10 segundos
-        QTimer.singleShot(10000, self.close_with_animation)
-    
-    def show_error(self, message: str = "Erro ao verificar o sistema"):
-        """
-        Mostra mensagem de erro
-        
-        Args:
-            message: Mensagem de erro
-        """
-        self.set_status(message, 100)
-        self.set_detail("Verifique os logs para mais detalhes")
-        self.update_style(Colors.DANGER)
-        
-        # Fecha automaticamente após 15 segundos
-        QTimer.singleShot(15000, self.close_with_animation)
-    
+        """Fase 2 — correção em andamento."""
+        self._status_lbl.setText("Corrigindo problemas encontrados...")
+        self._detail_lbl.setText(f"Aplicando correção: {module_name}")
+        self._progress.setValue(progress)
+        self._phase_lbl.setText("🔧  Fase 2 de 2 — Correção")
+        self._phase_lbl.setStyleSheet(
+            f"color: {Colors.WARNING}; background: transparent;"
+        )
+        self._set_accent(Colors.WARNING)
+
+    def show_success(self, message: str = ""):
+        """Conclusão sem problemas encontrados."""
+        self._status_lbl.setText("Sistema verificado com sucesso!")
+        self._detail_lbl.setText("Nenhum problema encontrado. Tudo em ordem.")
+        self._progress.setValue(100)
+        self._phase_lbl.setText("✓  Concluído")
+        self._phase_lbl.setStyleSheet(
+            f"color: {Colors.SUCCESS}; background: transparent;"
+        )
+        self._set_accent(Colors.SUCCESS)
+        QTimer.singleShot(_CLOSE_SUCCESS, self._dismiss)
+
     def show_partial_success(self, fixed: int, total: int):
-        """
-        Mostra sucesso parcial
-        
-        Args:
-            fixed: Número de problemas corrigidos
-            total: Total de problemas encontrados
-        """
-        self.set_status(f"{fixed} de {total} problemas foram corrigidos", 100)
-        self.set_detail("Alguns problemas requerem atenção manual")
-        self.update_style(Colors.WARNING)
-        
-        # Fecha automaticamente após 13 segundos
-        QTimer.singleShot(13000, self.close_with_animation)
-    
-    def close_with_animation(self):
-        """Fecha a janela com animação de fade out"""
-        # Por enquanto fecha direto, mas pode adicionar animação depois
+        """Alguns problemas corrigidos, outros precisam de atenção manual."""
+        self._status_lbl.setText(
+            f"{fixed} de {total} problema(s) corrigido(s) automaticamente."
+        )
+        self._detail_lbl.setText(
+            "Os demais requerem atenção manual. Abra o SAS-Caema para detalhes."
+        )
+        self._progress.setValue(100)
+        self._phase_lbl.setText("⚠  Concluído com avisos")
+        self._phase_lbl.setStyleSheet(
+            f"color: {Colors.WARNING}; background: transparent;"
+        )
+        self._set_accent(Colors.WARNING)
+        QTimer.singleShot(_CLOSE_PARTIAL, self._dismiss)
+
+    def show_error(self, message: str):
+        """Erro crítico durante o checkup."""
+        self._status_lbl.setText("Erro durante a verificação automática.")
+        self._detail_lbl.setText(message or "Verifique os logs para mais detalhes.")
+        self._progress.setValue(100)
+        self._phase_lbl.setText("✗  Falha")
+        self._phase_lbl.setStyleSheet(
+            f"color: {Colors.DANGER}; background: transparent;"
+        )
+        self._set_accent(Colors.DANGER)
+        QTimer.singleShot(_CLOSE_ERROR, self._dismiss)
+
+    # ── Ciclo de vida ──────────────────────────────────────────────────────
+
+    def _dismiss(self):
         self.close()
         self.closed.emit()
-    
+
     def showEvent(self, event):
-        """Evento ao mostrar a janela - adiciona animação de entrada suave"""
+        """Slide-up suave ao exibir."""
         super().showEvent(event)
-        
-        # Animação de slide-up suave
         screen = QApplication.desktop().screenGeometry()
-        final_x = screen.width() - self.width() - 20
-        final_y = screen.height() - self.height() - 60
-        
-        # Posição inicial (20px mais abaixo)
-        start_y = final_y + 20
-        
-        # Animação suave para posição final
-        self.animation = QPropertyAnimation(self, b"geometry")
-        self.animation.setDuration(400)  # 400ms - mais suave
-        self.animation.setStartValue(QRect(final_x, start_y, self.width(), self.height()))
-        self.animation.setEndValue(QRect(final_x, final_y, self.width(), self.height()))
-        self.animation.start()
+        x = screen.width() - _W - _MARGIN
+        y_final = screen.height() - _H - _TASKBAR
+
+        self._anim = QPropertyAnimation(self, b"geometry")
+        self._anim.setDuration(350)
+        self._anim.setStartValue(QRect(x, y_final + 20, _W, _H))
+        self._anim.setEndValue(QRect(x, y_final, _W, _H))
+        self._anim.start()

@@ -1,18 +1,21 @@
 """
-Modo Startup - Checkup com feedback visual na inicialização do Windows
+Modo Startup — Checkup com feedback visual na inicialização do Windows.
 """
 import sys
 from pathlib import Path
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QThread, pyqtSignal
 
-# Adiciona o diretório raiz ao path
 ROOT_DIR = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
+from common.theme import Styles
 from common.services.logger import logger_service
 from modules.checkup.services.checkup_service import CheckupService
 from modules.checkup.startup.startup_feedback import StartupFeedbackWindow
+
+_ICON_PATH = ROOT_DIR / "assets" / "images" / "icon.ico"
 
 
 class StartupCheckupThread(QThread):
@@ -117,8 +120,7 @@ class StartupCheckupThread(QThread):
             # Resultado final
             if fixed_count == issues_found:
                 self.logger.info(f"✓ Todos os {fixed_count} problema(s) foram corrigidos")
-                # self.finished_success.emit(f"{fixed_count} problema(s) corrigido(s)!")
-                self.finished_success.emit("")
+                self.finished_success.emit(f"{fixed_count} problema(s) corrigido(s) com sucesso!")
             else:
                 self.logger.info(f"⚠ {fixed_count} de {issues_found} problema(s) corrigidos")
                 self.finished_partial.emit(fixed_count, issues_found)
@@ -131,10 +133,12 @@ class StartupCheckupThread(QThread):
 
 
 def main():
-    """Função principal do modo startup"""
-    # Cria aplicação Qt
+    """Função principal do modo startup."""
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')
+    app.setStyle("Fusion")
+    app.setStyleSheet(Styles.global_app())
+    if _ICON_PATH.exists():
+        app.setWindowIcon(QIcon(str(_ICON_PATH)))
     
     # Cria janela de feedback
     feedback_window = StartupFeedbackWindow()
