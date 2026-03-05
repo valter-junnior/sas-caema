@@ -136,8 +136,9 @@ class HeaderBar(QWidget):
     """Barra de header escura com título e subtítulo."""
     def __init__(self, title: str, subtitle: str = "", parent=None):
         super().__init__(parent)
+        self.setObjectName("headerBar")
         self.setStyleSheet(f"""
-            QWidget {{
+            QWidget#headerBar {{
                 background-color: {Colors.HEADER_BG};
                 border-bottom: 3px solid {Colors.PRIMARY};
             }}

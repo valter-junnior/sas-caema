@@ -123,9 +123,12 @@ class SolutionsDialog(QDialog):
 
         # Header
         header = QWidget()
+        header.setObjectName("solutionsHeader")
         header.setStyleSheet(
+            f"QWidget#solutionsHeader {{"
             f"background-color: {Colors.BACKGROUND}; "
             f"border-bottom: 1px solid {Colors.BORDER};"
+            f"}}"
         )
         hl = QVBoxLayout(header)
         hl.setContentsMargins(28, 22, 28, 22)
@@ -165,9 +168,12 @@ class SolutionsDialog(QDialog):
 
         # Footer com botões
         footer = QWidget()
+        footer.setObjectName("solutionsFooter")
         footer.setStyleSheet(
+            f"QWidget#solutionsFooter {{"
             f"background-color: {Colors.BACKGROUND}; "
             f"border-top: 1px solid {Colors.BORDER};"
+            f"}}"
         )
         fl = QHBoxLayout(footer)
         fl.setContentsMargins(24, 14, 24, 14)

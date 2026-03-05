@@ -38,9 +38,12 @@ class BaseDialog(QDialog):
 
     def _add_header(self, icon: str, title: str, subtitle: str = ""):
         header = QWidget()
+        header.setObjectName("dialogHeader")
         header.setStyleSheet(
+            f"QWidget#dialogHeader {{"
             f"background-color: {Colors.BACKGROUND}; "
             f"border-bottom: 1px solid {Colors.BORDER};"
+            f"}}"
         )
         hl = QVBoxLayout(header)
         hl.setContentsMargins(28, 20, 28, 20)
@@ -79,9 +82,12 @@ class BaseDialog(QDialog):
 
     def _add_footer(self, *buttons):
         footer = QWidget()
+        footer.setObjectName("dialogFooter")
         footer.setStyleSheet(
+            f"QWidget#dialogFooter {{"
             f"background-color: {Colors.BACKGROUND}; "
             f"border-top: 1px solid {Colors.BORDER};"
+            f"}}"
         )
         fl = QHBoxLayout(footer)
         fl.setContentsMargins(24, 14, 24, 14)

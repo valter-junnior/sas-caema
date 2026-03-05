@@ -116,8 +116,9 @@ class WizardWindow(QDialog):
 
         # ── Header escuro ─────────────────────────────────────────
         header = QWidget()
+        header.setObjectName("wizardHeader")
         header.setStyleSheet(f"""
-            QWidget {{
+            QWidget#wizardHeader {{
                 background-color: {Colors.HEADER_BG};
                 border-bottom: 1px solid {Colors.HEADER_SURFACE};
             }}
@@ -160,9 +161,10 @@ class WizardWindow(QDialog):
 
         # ── Rodapé com botões ─────────────────────────────────────
         footer = QWidget()
+        footer.setObjectName("wizardFooter")
         footer.setFixedHeight(68)
         footer.setStyleSheet(f"""
-            QWidget {{
+            QWidget#wizardFooter {{
                 background-color: {Colors.SURFACE};
                 border-top: 1px solid {Colors.BORDER};
             }}

@@ -157,9 +157,10 @@ class MainWindow(QMainWindow):
 
     def _build_footer(self) -> QWidget:
         footer = QWidget()
+        footer.setObjectName("mainFooter")
         footer.setFixedHeight(40)
         footer.setStyleSheet(f"""
-            QWidget {{
+            QWidget#mainFooter {{
                 background-color: {Colors.SURFACE};
                 border-top: 1px solid {Colors.BORDER};
             }}
