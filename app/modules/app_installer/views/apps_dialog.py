@@ -263,8 +263,7 @@ class AppsDialog(QDialog):
         if not self._service.launch_installer(app):
             QMessageBox.warning(
                 self,
-                "Instalador não encontrado",
-                f"O instalador de <b>{app.display_name()}</b> não foi encontrado.<br><br>"
-                f"Coloque o arquivo <code>{app.installer_filename}</code> em:<br>"
-                f"<code>assets/apps/</code>",
+                "Não foi possível iniciar a instalação",
+                f"Não foi possível iniciar a instalação de <b>{app.display_name()}</b>.<br><br>"
+                f"Verifique se o instalador está disponível e tente novamente.",
             )
