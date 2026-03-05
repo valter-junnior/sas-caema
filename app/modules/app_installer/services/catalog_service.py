@@ -4,7 +4,6 @@ Serviço de catálogo de aplicativos — lê o CSV e extrai metadados dos execut
 import csv
 import ctypes
 import ctypes.wintypes
-import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -119,12 +118,19 @@ class CatalogService:
         return list(self._apps)
 
     def launch_installer(self, app: AppEntry) -> bool:
-        """Abre o instalador. O UAC é tratado pelo próprio instalador."""
+        """Abre o instalador com elevação UAC via ShellExecute (runas)."""
         if not app.is_available:
             self.logger.warning(f"Instalador não encontrado: {app.installer_path}")
             return False
         try:
-            subprocess.Popen([str(app.installer_path)], shell=False)
+            import ctypes
+            # ShellExecute com runas dispara o prompt de UAC automaticamente
+            ret = ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", str(app.installer_path), None, None, 1
+            )
+            # ShellExecute retorna > 32 em caso de sucesso
+            if ret <= 32:
+                raise OSError(f"ShellExecute retornou {ret}")
             self.logger.info(f"Instalador iniciado: {app.display_name()} ({app.installer_filename})")
             return True
         except Exception as e:

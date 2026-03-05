@@ -38,7 +38,7 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 
 ; Ícones e visual
-SetupIconFile=..\app\assets\icon.ico
+SetupIconFile=..\app\assets\images\icon.ico
 ; WizardImageFile=.\wizard-image.bmp
 ; WizardSmallImageFile=.\wizard-small.bmp
 

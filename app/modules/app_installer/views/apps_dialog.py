@@ -266,5 +266,5 @@ class AppsDialog(QDialog):
                 "Instalador não encontrado",
                 f"O instalador de <b>{app.display_name()}</b> não foi encontrado.<br><br>"
                 f"Coloque o arquivo <code>{app.installer_filename}</code> em:<br>"
-                f"<code>modules/app_installer/assets/apps/</code>",
+                f"<code>assets/apps/</code>",
             )
