@@ -15,24 +15,20 @@ PING_TIMEOUT = 3      # segundos
 PING_COUNT = 4        # número de pings
 
 # Configurações de UI
-STEP_COUNT = 5
+STEP_COUNT = 3
 RESTART_TIMER_SECONDS = 120  # 2 minutos
 
 # Textos das etapas
 STEP_TITLES = {
-    1: "Verificar Conexão do Cabo de Rede",
-    2: "Verificar Alimentação do Roteador/Modem",
-    3: "Verificar Indicadores de Conexão",
-    4: "Reiniciar Equipamentos de Rede",
-    5: "Verificar Conectividade de Internet"
+    1: "Verificar Cabos e Equipamento",
+    2: "Reiniciar Modem/Roteador",
+    3: "Testar Conexão",
 }
 
 STEP_INSTRUCTIONS = {
-    1: "Verifique se o cabo de rede está firmemente conectado ao seu computador e ao roteador/switch.",
-    2: "Certifique-se de que o roteador ou modem está ligado e funcionando corretamente.",
-    3: "Observe as luzes indicadoras na porta de rede do seu computador e do roteador.",
-    4: "Vamos reiniciar o modem/roteador para restabelecer a conexão.",
-    5: "Agora vamos testar se a internet foi restabelecida."
+    1: "Confirme os itens físicos antes de continuar.",
+    2: "Reinicie o modem/roteador para restabelecer a conexão.",
+    3: "Agora vamos verificar se a internet foi restabelecida.",
 }
 
 # Imagens das etapas
@@ -40,6 +36,4 @@ STEP_IMAGES = {
     1: ASSETS_DIR / "step1_placeholder.png",
     2: ASSETS_DIR / "step2_placeholder.png",
     3: ASSETS_DIR / "step3_placeholder.png",
-    4: ASSETS_DIR / "step4_placeholder.png",
-    5: ASSETS_DIR / "step5_placeholder.png"
 }

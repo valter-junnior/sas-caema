@@ -122,7 +122,7 @@ class BaseStepWidget(QWidget):
 
 
 class Step1Widget(BaseStepWidget):
-    """Etapa 1: Verificação Física do Cabo de Rede."""
+    """Etapa 1: Verificação Física do Cabo e Equipamento."""
 
     def __init__(self, parent=None):
         super().__init__(1, parent)
@@ -131,56 +131,18 @@ class Step1Widget(BaseStepWidget):
         layout.addWidget(self._make_checklist_card(
             "Confirme os itens abaixo:",
             [
-                "Cabo conectado ao computador",
-                "Cabo conectado ao roteador/switch",
+                "Cabo conectado ao computador e ao roteador",
                 "Cabo sem danos visíveis",
+                "Roteador/modem ligado e com luzes acesas",
             ],
         ))
 
 
 class Step2Widget(BaseStepWidget):
-    """Etapa 2: Verificação do Roteador/Modem."""
+    """Etapa 2: Reiniciar Modem/Roteador."""
 
     def __init__(self, parent=None):
         super().__init__(2, parent)
-
-    def _add_custom_content(self, layout: QVBoxLayout):
-        layout.addWidget(self._make_checklist_card(
-            "Confirme os itens abaixo:",
-            [
-                "Roteador/modem está ligado na tomada",
-                "Luzes indicadoras estão acesas",
-                "Equipamento não apresenta sinais de aquecimento excessivo",
-            ],
-        ))
-
-
-class Step3Widget(BaseStepWidget):
-    """Etapa 3: Verificação dos LEDs de Conexão."""
-
-    def __init__(self, parent=None):
-        super().__init__(3, parent)
-
-    def _add_custom_content(self, layout: QVBoxLayout):
-        layout.addWidget(InfoBanner(
-            "✓  LED aceso/piscando = Conexão detectada\n"
-            "✗  LED apagado = Sem conexão física",
-            'info',
-        ))
-        layout.addWidget(self._make_checklist_card(
-            "",
-            [
-                "LED da porta do computador está aceso",
-                "LED da porta do roteador está aceso",
-            ],
-        ))
-
-
-class Step4Widget(BaseStepWidget):
-    """Etapa 4: Reiniciar Equipamentos de Rede."""
-
-    def __init__(self, parent=None):
-        super().__init__(4, parent)
 
     def _add_custom_content(self, layout: QVBoxLayout):
         layout.addWidget(InfoBanner(
@@ -196,13 +158,13 @@ class Step4Widget(BaseStepWidget):
         ))
 
 
-class Step5Widget(BaseStepWidget):
-    """Etapa 5: Teste de Conectividade."""
+class Step3Widget(BaseStepWidget):
+    """Etapa 3: Teste de Conectividade."""
 
     test_completed = pyqtSignal(bool)
 
     def __init__(self, parent=None):
-        super().__init__(5, parent)
+        super().__init__(3, parent)
         self._test_result = None
 
     def _add_custom_content(self, layout: QVBoxLayout):

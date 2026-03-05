@@ -18,7 +18,7 @@ from common.services.logger import logger_service
 from modules.network_troubleshoot import config
 from modules.network_troubleshoot.services.step_validator import StepValidator
 from modules.network_troubleshoot.views.step_widgets import (
-    Step1Widget, Step2Widget, Step3Widget, Step4Widget, Step5Widget,
+    Step1Widget, Step2Widget, Step3Widget,
 )
 
 
@@ -151,12 +151,11 @@ class WizardWindow(QDialog):
 
         self.step_widgets = [
             Step1Widget(), Step2Widget(), Step3Widget(),
-            Step4Widget(), Step5Widget(),
         ]
         for w in self.step_widgets:
             self.content_stack.addWidget(w)
 
-        self.step_widgets[4].test_completed.connect(self._on_test_completed)
+        self.step_widgets[2].test_completed.connect(self._on_test_completed)
         root.addWidget(self.content_stack, stretch=1)
 
         # ── Rodapé com botões ─────────────────────────────────────
