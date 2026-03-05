@@ -149,7 +149,7 @@ class HeaderBar(QWidget):
         layout.setSpacing(6)
 
         title_label = QLabel(title)
-        title_label.setFont(Fonts.title(40))
+        title_label.setFont(Fonts.title(20))
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet(
             f"color: {Colors.HEADER_TEXT}; background: transparent; border: none;"
@@ -158,7 +158,7 @@ class HeaderBar(QWidget):
 
         if subtitle:
             sub = QLabel(subtitle)
-            sub.setFont(Fonts.subheading(15))
+            sub.setFont(Fonts.subheading(10))
             sub.setAlignment(Qt.AlignCenter)
             sub.setStyleSheet(
                 f"color: {Colors.HEADER_SUBTITLE}; background: transparent; border: none;"

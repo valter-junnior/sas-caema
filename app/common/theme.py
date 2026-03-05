@@ -188,7 +188,6 @@ class Styles:
             QMainWindow, QDialog, QWidget {{
                 background-color: {c.BACKGROUND};
                 font-family: {Fonts.FAMILY};
-                font-size: 10pt;
                 color: {c.TEXT_PRIMARY};
             }}
             QScrollBar:vertical {{

@@ -44,7 +44,7 @@ class ActionCard(Card):
         layout.setSpacing(10)
 
         icon_lbl = QLabel(icon)
-        icon_lbl.setFont(Fonts.title(26))
+        icon_lbl.setFont(Fonts.title(20))
         icon_lbl.setStyleSheet("background: transparent; border: none;")
         layout.addWidget(icon_lbl)
 
@@ -118,7 +118,7 @@ class MainWindow(QMainWindow):
         content_layout.setSpacing(20)
 
         welcome = QLabel("O que você quer fazer hoje?")
-        welcome.setFont(Fonts.heading(16))
+        welcome.setFont(Fonts.heading(15))
         welcome.setStyleSheet(f"color: {Colors.TEXT_PRIMARY}; background: transparent;")
         content_layout.addWidget(welcome)
 
