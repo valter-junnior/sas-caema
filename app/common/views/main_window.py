@@ -101,8 +101,14 @@ class MainWindow(QMainWindow):
         root_layout.setContentsMargins(0, 0, 0, 0)
         root_layout.setSpacing(0)
 
-        # Header
-        root_layout.addWidget(HeaderBar(APP_NAME, "Sistema de Automação de Suporte"))
+        # Header (card flutuante com margem)
+        header_wrapper = QWidget()
+        header_wrapper.setStyleSheet(f"background-color: {Colors.BACKGROUND};")
+        hw_layout = QVBoxLayout(header_wrapper)
+        hw_layout.setContentsMargins(20, 14, 20, 0)
+        hw_layout.setSpacing(0)
+        hw_layout.addWidget(HeaderBar(APP_NAME, "Sistema de Automação de Suporte"))
+        root_layout.addWidget(header_wrapper)
 
         # Área de conteúdo
         content_wrapper = QWidget()

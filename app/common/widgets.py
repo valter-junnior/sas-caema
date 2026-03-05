@@ -133,22 +133,24 @@ class CaptionLabel(QLabel):
 # ---------------------------------------------------------------------------
 
 class HeaderBar(QWidget):
-    """Barra de header escura com título e subtítulo."""
+    """Card de header arredondado com título e subtítulo centralizados."""
     def __init__(self, title: str, subtitle: str = "", parent=None):
         super().__init__(parent)
         self.setObjectName("headerBar")
-        self.setStyleSheet(f"""
-            QWidget#headerBar {{
-                background-color: {Colors.HEADER_BG};
-                border-bottom: 3px solid {Colors.PRIMARY};
-            }}
-        """)
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setStyleSheet(
+            f"QWidget#headerBar {{"
+            f"  background-color: {Colors.HEADER_BG};"
+            f"  border-radius: 12px;"
+            f"}}"
+        )
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(32, 22, 32, 22)
-        layout.setSpacing(4)
+        layout.setContentsMargins(36, 28, 36, 28)
+        layout.setSpacing(6)
 
         title_label = QLabel(title)
-        title_label.setFont(Fonts.title(20))
+        title_label.setFont(Fonts.title(40))
+        title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet(
             f"color: {Colors.HEADER_TEXT}; background: transparent; border: none;"
         )
@@ -156,12 +158,12 @@ class HeaderBar(QWidget):
 
         if subtitle:
             sub = QLabel(subtitle)
-            sub.setFont(Fonts.body(10))
+            sub.setFont(Fonts.subheading(15))
+            sub.setAlignment(Qt.AlignCenter)
             sub.setStyleSheet(
                 f"color: {Colors.HEADER_SUBTITLE}; background: transparent; border: none;"
             )
             layout.addWidget(sub)
-
 
 class InfoBanner(QFrame):
     """Banner colorido para mensagens de info/sucesso/aviso/erro."""
