@@ -21,9 +21,9 @@ _W, _H      = 440, 250
 _MARGIN     = 20
 _TASKBAR    = 56  # altura estimada da barra de tarefas do Windows
 
-_CLOSE_SUCCESS = 8_000   # ms
-_CLOSE_PARTIAL = 12_000
-_CLOSE_ERROR   = 15_000
+_CLOSE_SUCCESS = 5_000   # ms
+_CLOSE_PARTIAL = 10_000
+_CLOSE_ERROR   = 12_000
 
 
 class StartupFeedbackWindow(QWidget):
