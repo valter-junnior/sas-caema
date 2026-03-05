@@ -40,7 +40,7 @@ class StepIndicator(QWidget):
         while self._layout.count():
             item = self._layout.takeAt(0)
             if item.widget():
-                item.widget().deleteLater()
+                item.widget().setParent(None)
 
         for i in range(1, self._total + 1):
             is_done = i < self._current

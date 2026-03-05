@@ -1,4 +1,4 @@
-﻿"""
+"""
 Widgets de cada etapa do wizard de troubleshooting de rede.
 """
 import sys
@@ -31,7 +31,7 @@ class BaseStepWidget(QWidget):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
 
-        # Ãrea de scroll para conteÃºdo longo
+        # Área de scroll para conteúdo longo
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -47,7 +47,7 @@ class BaseStepWidget(QWidget):
         layout.setContentsMargins(28, 24, 28, 24)
         layout.setSpacing(16)
 
-        # TÃ­tulo da etapa
+        # Título da etapa
         title_text = config.STEP_TITLES.get(self._step_number, f"Etapa {self._step_number}")
         title_lbl = QLabel(title_text)
         title_lbl.setFont(Fonts.heading(14))
@@ -55,7 +55,7 @@ class BaseStepWidget(QWidget):
         title_lbl.setWordWrap(True)
         layout.addWidget(title_lbl)
 
-        # Ãrea de imagem
+        # Área de imagem
         self._image_label = QLabel()
         self._image_label.setAlignment(Qt.AlignCenter)
         self._image_label.setMinimumHeight(180)
@@ -72,13 +72,13 @@ class BaseStepWidget(QWidget):
         self._load_image()
         layout.addWidget(self._image_label)
 
-        # InstruÃ§Ã£o da etapa
+        # Instrução da etapa
         instruction = config.STEP_INSTRUCTIONS.get(self._step_number, "")
         if instruction:
             inst_lbl = BodyLabel(instruction)
             layout.addWidget(inst_lbl)
 
-        # ConteÃºdo especÃ­fico da etapa
+        # Conteúdo específico da etapa
         self._add_custom_content(layout)
         layout.addStretch()
 
@@ -89,10 +89,10 @@ class BaseStepWidget(QWidget):
             scaled = pixmap.scaled(460, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             self._image_label.setPixmap(scaled)
         else:
-            self._image_label.setText(f"[Imagem â€” Etapa {self._step_number}]")
+            self._image_label.setText(f"[Imagem — Etapa {self._step_number}]")
 
     def _add_custom_content(self, layout: QVBoxLayout):
-        """Sobrescrever nas subclasses para adicionar conteÃºdo especÃ­fico."""
+        """Sobrescrever nas subclasses para adicionar conteúdo específico."""
         pass
 
     def _make_checkbox(self, text: str) -> QCheckBox:
@@ -122,7 +122,7 @@ class BaseStepWidget(QWidget):
 
 
 class Step1Widget(BaseStepWidget):
-    """Etapa 1: VerificaÃ§Ã£o FÃ­sica do Cabo de Rede."""
+    """Etapa 1: Verificação Física do Cabo de Rede."""
 
     def __init__(self, parent=None):
         super().__init__(1, parent)
@@ -133,13 +133,13 @@ class Step1Widget(BaseStepWidget):
             [
                 "Cabo conectado ao computador",
                 "Cabo conectado ao roteador/switch",
-                "Cabo sem danos visÃ­veis",
+                "Cabo sem danos visíveis",
             ],
         ))
 
 
 class Step2Widget(BaseStepWidget):
-    """Etapa 2: VerificaÃ§Ã£o do Roteador/Modem."""
+    """Etapa 2: Verificação do Roteador/Modem."""
 
     def __init__(self, parent=None):
         super().__init__(2, parent)
@@ -148,30 +148,30 @@ class Step2Widget(BaseStepWidget):
         layout.addWidget(self._make_checklist_card(
             "Confirme os itens abaixo:",
             [
-                "Roteador/modem estÃ¡ ligado na tomada",
-                "Luzes indicadoras estÃ£o acesas",
-                "Equipamento nÃ£o apresenta sinais de aquecimento excessivo",
+                "Roteador/modem está ligado na tomada",
+                "Luzes indicadoras estão acesas",
+                "Equipamento não apresenta sinais de aquecimento excessivo",
             ],
         ))
 
 
 class Step3Widget(BaseStepWidget):
-    """Etapa 3: VerificaÃ§Ã£o dos LEDs de ConexÃ£o."""
+    """Etapa 3: Verificação dos LEDs de Conexão."""
 
     def __init__(self, parent=None):
         super().__init__(3, parent)
 
     def _add_custom_content(self, layout: QVBoxLayout):
         layout.addWidget(InfoBanner(
-            "âœ“  LED aceso/piscando = ConexÃ£o detectada\n"
-            "âœ—  LED apagado = Sem conexÃ£o fÃ­sica",
+            "✓  LED aceso/piscando = Conexão detectada\n"
+            "✗  LED apagado = Sem conexão física",
             'info',
         ))
         layout.addWidget(self._make_checklist_card(
             "",
             [
-                "LED da porta do computador estÃ¡ aceso",
-                "LED da porta do roteador estÃ¡ aceso",
+                "LED da porta do computador está aceso",
+                "LED da porta do roteador está aceso",
             ],
         ))
 
@@ -187,11 +187,11 @@ class Step4Widget(BaseStepWidget):
             "1. Desligue o modem/roteador da tomada\n"
             "2. Aguarde 30 segundos\n"
             "3. Ligue novamente o equipamento\n"
-            "4. Aguarde aproximadamente 2 minutos para inicializaÃ§Ã£o completa",
+            "4. Aguarde aproximadamente 2 minutos para inicialização completa",
             'info',
         ))
         layout.addWidget(InfoBanner(
-            "â±ï¸  ApÃ³s realizar os passos acima, clique em 'PrÃ³ximo' para testar a conectividade.",
+            "⏱️  Após realizar os passos acima, clique em 'Próximo' para testar a conectividade.",
             'warning',
         ))
 
@@ -206,7 +206,7 @@ class Step5Widget(BaseStepWidget):
         self._test_result = None
 
     def _add_custom_content(self, layout: QVBoxLayout):
-        self._test_btn = SuccessButton("â–¶  Testar ConexÃ£o")
+        self._test_btn = SuccessButton("▶  Testar Conexão")
         self._test_btn.setMinimumHeight(46)
         self._test_btn.clicked.connect(self._run_test)
         layout.addWidget(self._test_btn)
@@ -233,7 +233,7 @@ class Step5Widget(BaseStepWidget):
         self._test_result = connected
 
         if connected:
-            self._result_label.setText("âœ“  ConexÃ£o restabelecida! O problema foi resolvido.")
+            self._result_label.setText("✓  Conexão restabelecida! O problema foi resolvido.")
             self._result_label.setStyleSheet(f"""
                 color: {Colors.SUCCESS};
                 background-color: {Colors.SUCCESS_SURFACE};
@@ -244,8 +244,8 @@ class Step5Widget(BaseStepWidget):
             """)
         else:
             self._result_label.setText(
-                "âœ—  A conexÃ£o ainda nÃ£o foi restabelecida.\n"
-                "Ã‰ necessÃ¡rio abrir um chamado para o suporte."
+                "✗  A conexão ainda não foi restabelecida.\n"
+                "É necessário abrir um chamado para o suporte."
             )
             self._result_label.setStyleSheet(f"""
                 color: {Colors.DANGER};

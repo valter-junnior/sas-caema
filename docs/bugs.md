@@ -1,0 +1,1 @@
+reduza o passo a passo na solução de network_troubleshoot sendo só 3 etapas e simplificando também os checkbox para simplificar e facilitar a vida do usuário
