@@ -1,1 +1,1 @@
-algumas partes do frontend estão muito feias tente manter alguma consistência tem texto sublinhados que não deveria estar ao executar soluç~eoes  as opoces o titulo o icon e a descrição toda estão com bordas interativas muito estranho alem disso o titulo na pagina inical ta pequeno acho que deveria ser maior a parte do checkup ta melho que duplicado o visual tanto da lista quanto do item dentro da lista no checkup
+o titulo "Sistema de Automação de Suporte" deveria ser maior e bem melhor estilziado na home

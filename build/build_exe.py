@@ -46,6 +46,7 @@ def build_main_exe(root_dir, app_dir, dist_dir, build_dir):
     
     spec_file = root_dir / "SAS-Caema.spec"
     manifest_file = Path(__file__).parent / "app.manifest"
+    icon_file = root_dir / "app" / "assets" / "icon.ico"
     
     pyinstaller_args = [
         sys.executable,
@@ -55,7 +56,7 @@ def build_main_exe(root_dir, app_dir, dist_dir, build_dir):
         "--onefile",
         "--windowed",
         f"--manifest={manifest_file}",  # Força admin permanentemente
-        "--icon=NONE",
+        f"--icon={icon_file}",
         f"--distpath={dist_dir}",
         f"--workpath={build_dir}",
         f"--specpath={root_dir}",
@@ -114,6 +115,7 @@ def build_startup_exe(root_dir, app_dir, dist_dir, build_dir):
     
     spec_file = root_dir / "SAS-Caema-Startup.spec"
     manifest_file = Path(__file__).parent / "startup.manifest"
+    icon_file = root_dir / "app" / "assets" / "icon.ico"
     
     pyinstaller_args = [
         sys.executable,
@@ -123,7 +125,7 @@ def build_startup_exe(root_dir, app_dir, dist_dir, build_dir):
         "--onefile",
         "--windowed",
         f"--manifest={manifest_file}",  # Força admin permanentemente
-        "--icon=NONE",
+        f"--icon={icon_file}",
         f"--distpath={dist_dir}",
         f"--workpath={build_dir}",
         f"--specpath={root_dir}",

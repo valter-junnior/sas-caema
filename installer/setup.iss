@@ -37,8 +37,8 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 
-; Ícones e visual (usando padrão do Inno Setup)
-; SetupIconFile=..\app\assets\icon.ico
+; Ícones e visual
+SetupIconFile=..\app\assets\icon.ico
 ; WizardImageFile=.\wizard-image.bmp
 ; WizardSmallImageFile=.\wizard-small.bmp
 
