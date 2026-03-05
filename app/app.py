@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT_DIR))
 from common.theme import Styles, Fonts
 from common.views.main_window import MainWindow
 
-_ICON_PATH = ROOT_DIR / "assets" / "icon.ico"
+_ICON_PATH = ROOT_DIR / "assets" / "images" / "icon.ico"
 
 
 def main():

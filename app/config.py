@@ -38,8 +38,8 @@ WALLPAPER_CONFIG = {
     "text_size": 20,  # Tamanho da fonte aumentado para melhor legibilidade
     "text_position": "top-right",  # top-right, top-left, bottom-right, bottom-left
     "font": "Arial",
-    "background_image": ASSETS_DIR / "wallpaper_base.png",
-    "output_path": ASSETS_DIR / "wallpaper_generated.png",
+    "background_image": ASSETS_DIR / "images" / "wallpaper_base.png",
+    "output_path": ASSETS_DIR / "images" / "wallpaper_generated.png",
     "padding": 20,  # Pixels de padding do texto nas bordas
 }
 

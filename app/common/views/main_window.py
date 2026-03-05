@@ -24,6 +24,7 @@ from common.services.solutions_service import solutions_service
 from modules.checkup.threads.checkup_thread import CheckupThread
 from common.views.dialogs import ResultDialogs
 from common.views.solutions_dialog import SolutionsDialog
+from modules.app_installer.main import AppInstallerModule
 
 
 class ActionCard(Card):
@@ -151,6 +152,19 @@ class MainWindow(QMainWindow):
         )
         self._solutions_card.button.clicked.connect(self._show_solutions)
         cards_layout.addWidget(self._solutions_card)
+
+        self._apps_card = ActionCard(
+            icon="📦",
+            title="Instalar Aplicativos",
+            description=(
+                "Instale os principais programas do ambiente de trabalho "
+                "com um único clique, sem precisar acessar sites externos."
+            ),
+            button_text="Ver Aplicativos",
+            button_style='primary',
+        )
+        self._apps_card.button.clicked.connect(self._open_app_installer)
+        cards_layout.addWidget(self._apps_card)
 
         content_layout.addLayout(cards_layout)
         content_layout.addStretch()
@@ -319,6 +333,14 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             self.logger.error(f"Erro ao abrir menu de soluções: {e}")
+            ResultDialogs.show_error(self, str(e))
+
+    def _open_app_installer(self):
+        try:
+            self.logger.info("Abrindo instalador de aplicativos...")
+            AppInstallerModule().execute(parent=self)
+        except Exception as e:
+            self.logger.error(f"Erro ao abrir instalador: {e}")
             ResultDialogs.show_error(self, str(e))
 
     def closeEvent(self, event):
