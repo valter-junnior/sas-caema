@@ -46,6 +46,18 @@ class SolutionsService:
                 'enabled': True,
                 'icon': '🖼️'
             })
+
+            # Registra módulo de configuração de proxy
+            from modules.proxy_setup.main import ProxySetupModule
+
+            self.solutions.append({
+                'id': 'proxy_setup',
+                'name': 'Configurar Proxy',
+                'description': 'Configura automaticamente o proxy de rede (10.39.192.11:3128) no sistema',
+                'module': ProxySetupModule,
+                'enabled': True,
+                'icon': '🌐'
+            })
             
             self.logger.info(f"Carregadas {len(self.solutions)} soluções de troubleshooting")
             

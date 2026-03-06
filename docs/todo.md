@@ -1,5 +1,6 @@
-seguindo esse fluxo de refatoração e melhoria visual das implementações seguindo o clean code + DRY 
+crie um novo modulo igual ao network_troubleshoot mas que seria pra setar proxy no computador automatico sendo ese proxy aqui
 
-e na interface uma interface morderna quase que web igual esta sendo feito no app
+ 10.39.192.11
 
-quero que refatore e corrija tudo no startup também deixando o visual compativel com o visual do app em sincronia além disso corrigindo se identificar algum bug ou erro de logica textos e feedbacks
+ 3128
+ 
