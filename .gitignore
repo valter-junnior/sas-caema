@@ -42,6 +42,9 @@ Thumbs.db
 
 # Configurações locais
 local_config.py
+.env
+.env.local
+!.env.example
 
 # Imagens geradas
 app/assets/wallpaper_generated.png
@@ -60,3 +63,10 @@ dist/
 # releases/*.exe
 
 build_temp
+
+# Assets de instaladores (baixados/sincronizados via espelho)
+app/assets/apps/*
+!app/assets/apps/.gitkeep
+
+# Espelho local de assets (OneDrive/rede/pasta local)
+assets_mirror/

@@ -169,7 +169,7 @@ if __name__ == "__main__":
     from pathlib import Path
     
     # Cria imagem de teste se não existir
-    base_path = Path("../../../assets/wallpaper_base.png")
+    base_path = Path("../../../assets/wallpaper.jpeg")
     if not base_path.exists():
         print("Criando imagem de teste...")
         test_img = Image.new('RGB', (1920, 1080), color=(30, 30, 30))

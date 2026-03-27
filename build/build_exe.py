@@ -40,6 +40,45 @@ def install_pyinstaller():
         print_colored("✗ Erro ao instalar PyInstaller", RED)
         return False
 
+def sync_assets_mirror(root_dir):
+    """Sincroniza app/assets/apps com pasta espelhada antes do build."""
+    if os.environ.get("SKIP_ASSETS_SYNC", os.environ.get("SKIP_SUPABASE_SYNC", "0")) == "1":
+        print_colored("[ASSETS] Sync ignorado (SKIP_ASSETS_SYNC=1)", YELLOW)
+        return True
+
+    sync_script = root_dir / "build" / "supabase_assets.py"
+    if not sync_script.exists():
+        print_colored(f"✗ Script de sync não encontrado: {sync_script}", RED)
+        return False
+
+    print_colored("[ASSETS] Sincronizando app/assets/apps...", YELLOW)
+    try:
+        result = subprocess.run(
+            [sys.executable, str(sync_script), "sync"],
+            capture_output=True,
+            text=True,
+            cwd=root_dir
+        )
+
+        if result.stdout:
+            print(result.stdout)
+
+        if result.returncode != 0:
+            print_colored("✗ Falha no sync de assets", RED)
+            if result.stderr:
+                print(result.stderr)
+            print_colored(
+                "Defina ASSETS_MIRROR_DIR para sincronizar em pasta remota opcional.",
+                YELLOW,
+            )
+            return False
+
+        print_colored("✓ Sync de assets concluído", GREEN)
+        return True
+    except Exception as e:
+        print_colored(f"✗ Erro ao sincronizar assets: {e}", RED)
+        return False
+
 def build_main_exe(root_dir, app_dir, dist_dir, build_dir):
     """Cria o executável principal"""
     print_colored("\n[ETAPA 1/2] Gerando executável principal...", BLUE)
@@ -62,7 +101,7 @@ def build_main_exe(root_dir, app_dir, dist_dir, build_dir):
         f"--specpath={root_dir}",
         
         # Adiciona dados necessários
-        f"--add-data={app_dir / 'assets'};assets",
+        f"--add-data={app_dir / 'assets' / 'images'};assets/images",
         f"--add-data={app_dir / 'modules'};modules",
         f"--add-data={app_dir / 'common'};common",
         f"--add-data={app_dir / 'config.py'};.",
@@ -131,7 +170,7 @@ def build_startup_exe(root_dir, app_dir, dist_dir, build_dir):
         f"--specpath={root_dir}",
         
         # Adiciona dados necessários
-        f"--add-data={app_dir / 'assets'};assets",
+        f"--add-data={app_dir / 'assets' / 'images'};assets/images",
         f"--add-data={app_dir / 'modules'};modules",
         f"--add-data={app_dir / 'common'};common",
         f"--add-data={app_dir / 'config.py'};.",
@@ -202,6 +241,10 @@ def build_all():
     
     # Cria diretório de releases
     dist_dir.mkdir(exist_ok=True)
+
+    # Sincroniza assets/apps em pasta espelhada antes de gerar os executáveis
+    if not sync_assets_mirror(root_dir):
+        return False
     
     # Build do executável principal
     if not build_main_exe(root_dir, app_dir, dist_dir, build_dir):
