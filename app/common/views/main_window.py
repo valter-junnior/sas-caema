@@ -47,7 +47,7 @@ class ActionCard(Card):
         icon_lbl = QLabel(icon)
         icon_lbl.setFont(Fonts.title(20))
         icon_lbl.setStyleSheet("background: transparent; border: none;")
-        layout.addWidget(icon_lbl)
+        # layout.addWidget(icon_lbl)
 
         title_lbl = QLabel(title)
         title_lbl.setFont(Fonts.heading(14))

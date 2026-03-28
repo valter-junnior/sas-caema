@@ -12,13 +12,18 @@ GITHUB_RAW_BASE = (
 )
 CATALOG_FILENAME = "catalog.csv"
 _USER_AGENT = "sas-caema/1.0"
+_NO_CACHE_HEADERS = {
+    "User-Agent": _USER_AGENT,
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+}
 
 
 def download_catalog(dest: Path, timeout: int = 15) -> None:
     """Download catalog.csv from GitHub and write to dest."""
     url = f"{GITHUB_RAW_BASE}/{CATALOG_FILENAME}"
     dest.parent.mkdir(parents=True, exist_ok=True)
-    req = Request(url, headers={"User-Agent": _USER_AGENT})
+    req = Request(url, headers=_NO_CACHE_HEADERS)
     try:
         with urlopen(req, timeout=timeout) as resp:
             dest.write_bytes(resp.read())
@@ -39,7 +44,7 @@ def download_app(
     """
     url = f"{GITHUB_RAW_BASE}/{filename}"
     dest.parent.mkdir(parents=True, exist_ok=True)
-    req = Request(url, headers={"User-Agent": _USER_AGENT})
+    req = Request(url, headers=_NO_CACHE_HEADERS)
     try:
         with urlopen(req, timeout=timeout) as resp:
             total = int(resp.headers.get("Content-Length") or 0)

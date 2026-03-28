@@ -146,25 +146,53 @@ class AppCard(QFrame):
         super().leaveEvent(event)
 
 
+class _CatalogUpdateThread(QThread):
+    """Baixa catalog.csv do GitHub em background."""
+
+    updated = pyqtSignal()   # emitido quando o arquivo foi realmente alterado
+
+    def run(self):
+        try:
+            from common.services.github_assets_service import download_catalog
+            from config import APPS_DIR
+            import hashlib
+            dest = APPS_DIR / "catalog.csv"
+            before = dest.read_bytes() if dest.exists() else b""
+            download_catalog(dest, timeout=10)
+            after = dest.read_bytes() if dest.exists() else b""
+            if before != after:
+                self.updated.emit()
+        except Exception:
+            pass  # sem internet: usa cache local
+
+
 class AppsDialog(QDialog):
     """Dialog principal do instalador de aplicativos."""
 
     def __init__(self, parent=None):
         super().__init__(parent)
         self._download_threads: list[_DownloadThread] = []
-        self._refresh_catalog()
+        self._catalog_thread: _CatalogUpdateThread | None = None
         self._service = CatalogService()
         self._all_apps = self._service.get_all()
         self._build_ui()
+        self._start_catalog_update()
 
-    def _refresh_catalog(self):
-        """Baixa o catalog.csv do GitHub (silencioso em caso de falha)."""
-        try:
-            from common.services.github_assets_service import download_catalog
-            from config import APPS_DIR
-            download_catalog(APPS_DIR / "catalog.csv", timeout=8)
-        except Exception:
-            pass  # usa cache local se não houver internet
+    def _start_catalog_update(self):
+        """Inicia download do catalog.csv em background; recarrega grid se mudar."""
+        self._catalog_thread = _CatalogUpdateThread()
+        self._catalog_thread.updated.connect(self._on_catalog_updated)
+        self._catalog_thread.start()
+
+    def _on_catalog_updated(self):
+        """Chamado na thread principal quando o catálogo foi atualizado."""
+        self._service.reload()
+        self._all_apps = self._service.get_all()
+        current_search = self._search.text().strip()
+        if current_search:
+            self._on_search(current_search)
+        else:
+            self._render_apps(self._all_apps)
 
     def _build_ui(self):
         self.setWindowTitle("Instalador de Aplicativos")
