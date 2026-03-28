@@ -4,13 +4,19 @@ Serviço de catálogo de aplicativos — lê o CSV e extrai metadados dos execut
 import csv
 import ctypes
 import ctypes.wintypes
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+_ROOT = Path(__file__).parent.parent.parent.parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+
+from config import APPS_DIR
 from common.services.logger import logger_service
 
-CATALOG_PATH = Path(__file__).parent.parent.parent.parent / "assets" / "apps" / "catalog.csv"
-INSTALLERS_DIR = Path(__file__).parent.parent.parent.parent / "assets" / "apps"
+CATALOG_PATH = APPS_DIR / "catalog.csv"
+INSTALLERS_DIR = APPS_DIR
 
 
 def _read_exe_metadata(path: Path) -> dict:
@@ -116,6 +122,11 @@ class CatalogService:
 
     def get_all(self) -> list[AppEntry]:
         return list(self._apps)
+
+    def reload(self):
+        """Relê o catálogo do disco (útil após download do catalog.csv)."""
+        self._apps = []
+        self._load()
 
     def launch_installer(self, app: AppEntry) -> bool:
         """Abre o instalador com elevação UAC via ShellExecute (runas)."""

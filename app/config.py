@@ -10,18 +10,21 @@ BASE_DIR = Path(__file__).parent.absolute()
 ASSETS_DIR = BASE_DIR / "assets"
 MODULES_DIR = BASE_DIR / "modules"
 
-# Diretório de logs - ajusta automaticamente para executáveis
+# Diretório de logs e apps — ajusta automaticamente para executáveis
 if getattr(sys, 'frozen', False):
     # Quando executando como .exe instalado - usa AppData para evitar problemas de permissão
     # Logs em C:\Users\{usuario}\AppData\Local\SAS-Caema\logs\
     appdata_local = os.environ.get('LOCALAPPDATA') or os.path.join(os.environ.get('USERPROFILE', ''), 'AppData', 'Local')
     LOGS_DIR = Path(appdata_local) / "SAS-Caema" / "logs"
+    APPS_DIR = Path(appdata_local) / "SAS-Caema" / "apps"
 else:
     # Quando executando como script Python
     LOGS_DIR = BASE_DIR / "logs"
+    APPS_DIR = BASE_DIR / "assets" / "apps"
 
-# Criar diretório de logs se não existir
+# Criar diretórios se não existirem
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
+APPS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Configurações da Aplicação
 APP_NAME = "SAS - Caema"

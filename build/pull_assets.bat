@@ -1,19 +1,14 @@
 @echo off
-:: Baixa app/assets/apps da pasta espelhada para ambiente local
+:: Assets são baixados automaticamente do GitHub ao iniciar o app.
+:: Este script não é mais necessário.
 
 echo ========================================
-echo      SAS-Caema - Pull de Assets
+echo      SAS-Caema - Assets via GitHub
 echo ========================================
 echo.
-
-cd /d "%~dp0\.."
-python build\supabase_assets.py pull
-
-if errorlevel 1 (
-    echo.
-    echo [ERRO] Falha ao baixar assets da pasta espelhada.
-    exit /b 1
-)
-
+echo Os assets (catalog.csv e instaladores) sao baixados automaticamente
+echo do repositorio GitHub ao iniciar a aplicacao.
 echo.
-echo [OK] Assets baixados com sucesso.
+echo Repositorio: https://github.com/valter-junnior/sas-caema-apps
+echo.
+pause

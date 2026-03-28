@@ -6,8 +6,9 @@ from pathlib import Path
 from PyQt5.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout, QLabel, QWidget,
     QScrollArea, QFrame, QMessageBox, QLineEdit, QGridLayout,
+    QProgressDialog,
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QFileInfo
+from PyQt5.QtCore import Qt, pyqtSignal, QFileInfo, QThread
 from PyQt5.QtGui import QFont, QCursor, QIcon
 from PyQt5.QtWidgets import QFileIconProvider
 
@@ -26,6 +27,31 @@ def _get_icon(app: AppEntry) -> QIcon:
     if app.is_available:
         return _ICON_PROVIDER.icon(QFileInfo(str(app.installer_path)))
     return _ICON_PROVIDER.icon(QFileIconProvider.File)
+
+
+class _DownloadThread(QThread):
+    """Thread que baixa um instalador do GitHub e emite progresso."""
+
+    progress = pyqtSignal(int, int)   # downloaded_bytes, total_bytes
+    success = pyqtSignal()
+    failed = pyqtSignal(str)
+
+    def __init__(self, filename: str, dest: Path):
+        super().__init__()
+        self._filename = filename
+        self._dest = dest
+
+    def run(self):
+        try:
+            from common.services.github_assets_service import download_app
+            download_app(
+                self._filename,
+                self._dest,
+                progress_callback=lambda d, t: self.progress.emit(d, t),
+            )
+            self.success.emit()
+        except Exception as exc:
+            self.failed.emit(str(exc))
 
 
 class AppCard(QFrame):
@@ -100,7 +126,7 @@ class AppCard(QFrame):
             badge = QLabel("● Disponível")
             badge.setStyleSheet(f"color: {Colors.SUCCESS}; background: transparent; border: none;")
         else:
-            badge = QLabel("○ Não encontrado")
+            badge = QLabel("⬇ Download ao instalar")
             badge.setStyleSheet(f"color: {Colors.TEXT_MUTED}; background: transparent; border: none;")
         badge.setFont(Fonts.caption(7))
         badge.setAlignment(Qt.AlignCenter)
@@ -108,7 +134,6 @@ class AppCard(QFrame):
 
         btn = PrimaryButton("Instalar")
         btn.setMinimumHeight(32)
-        btn.setEnabled(self._app.is_available)
         btn.clicked.connect(lambda: self.install_requested.emit(self._app))
         layout.addWidget(btn)
 
@@ -126,9 +151,20 @@ class AppsDialog(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._download_threads: list[_DownloadThread] = []
+        self._refresh_catalog()
         self._service = CatalogService()
         self._all_apps = self._service.get_all()
         self._build_ui()
+
+    def _refresh_catalog(self):
+        """Baixa o catalog.csv do GitHub (silencioso em caso de falha)."""
+        try:
+            from common.services.github_assets_service import download_catalog
+            from config import APPS_DIR
+            download_catalog(APPS_DIR / "catalog.csv", timeout=8)
+        except Exception:
+            pass  # usa cache local se não houver internet
 
     def _build_ui(self):
         self.setWindowTitle("Instalador de Aplicativos")
@@ -260,6 +296,12 @@ class AppsDialog(QDialog):
         self._render_apps(filtered)
 
     def _on_install(self, app: AppEntry):
+        if app.is_available:
+            self._launch(app)
+        else:
+            self._download_and_install(app)
+
+    def _launch(self, app: AppEntry):
         if not self._service.launch_installer(app):
             QMessageBox.warning(
                 self,
@@ -267,3 +309,41 @@ class AppsDialog(QDialog):
                 f"Não foi possível iniciar a instalação de <b>{app.display_name()}</b>.<br><br>"
                 f"Verifique se o instalador está disponível e tente novamente.",
             )
+
+    def _download_and_install(self, app: AppEntry):
+        prog = QProgressDialog(
+            f"Baixando {app.display_name()}...", "Cancelar", 0, 100, self
+        )
+        prog.setWindowTitle("Baixando")
+        prog.setWindowModality(Qt.WindowModal)
+        prog.setMinimumDuration(0)
+        prog.setValue(0)
+
+        thread = _DownloadThread(app.installer_filename, app.installer_path)
+        self._download_threads.append(thread)
+
+        def on_progress(downloaded: int, total: int):
+            if total:
+                prog.setValue(int(downloaded / total * 100))
+            else:
+                prog.setValue(min(prog.value() + 1, 99))
+
+        def on_success():
+            prog.setValue(100)
+            prog.close()
+            self._launch(app)
+
+        def on_failed(msg: str):
+            prog.close()
+            QMessageBox.warning(
+                self,
+                "Erro no download",
+                f"Não foi possível baixar <b>{app.display_name()}</b>.<br><br>{msg}",
+            )
+
+        thread.progress.connect(on_progress)
+        thread.success.connect(on_success)
+        thread.failed.connect(on_failed)
+        prog.canceled.connect(thread.terminate)
+        thread.start()
+        prog.exec_()

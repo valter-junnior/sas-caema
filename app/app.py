@@ -2,6 +2,7 @@
 Aplicação principal do SAS-Caema.
 """
 import sys
+import threading
 from pathlib import Path
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont
@@ -13,6 +14,16 @@ from common.theme import Styles, Fonts
 from common.views.main_window import MainWindow
 
 _ICON_PATH = ROOT_DIR / "assets" / "images" / "icon.ico"
+
+
+def _fetch_catalog_background():
+    """Baixa o catalog.csv do GitHub em segundo plano ao iniciar."""
+    try:
+        from common.services.github_assets_service import download_catalog
+        from config import APPS_DIR
+        download_catalog(APPS_DIR / "catalog.csv")
+    except Exception:
+        pass  # sem internet ou erro: usa cache local
 
 
 def main():
@@ -27,6 +38,9 @@ def main():
 
     window = MainWindow()
     window.show()
+
+    # Atualiza catálogo em background logo ao iniciar
+    threading.Thread(target=_fetch_catalog_background, daemon=True).start()
 
     sys.exit(app.exec_())
 

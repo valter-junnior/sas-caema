@@ -64,9 +64,6 @@ dist/
 
 build_temp
 
-# Assets de instaladores (baixados/sincronizados via espelho)
+# Assets de instaladores (baixados do GitHub em runtime)
 app/assets/apps/*
 !app/assets/apps/.gitkeep
-
-# Espelho local de assets (OneDrive/rede/pasta local)
-assets_mirror/

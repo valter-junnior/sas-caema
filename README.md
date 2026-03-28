@@ -105,6 +105,15 @@ installer\Output\                 # Instalador profissional
 └── SAS-Caema-Setup.exe
 ```
 
+### Assets (catálogo e instaladores)
+
+Os assets são hospedados no GitHub:
+**https://github.com/valter-junnior/sas-caema-apps**
+
+- Ao iniciar o app, o `catalog.csv` é baixado automaticamente em segundo plano.
+- Ao clicar em **Instalar** em um app, o instalador é baixado do GitHub na hora.
+- Nenhuma configuração adicional é necessária.
+
 ### Testar Módulos
 ```powershell
 cd app
