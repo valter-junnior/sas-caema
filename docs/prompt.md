@@ -1,1 +1,0 @@
-faça um code review no projeto e de forma resumida mostre apenas os erros de código e possivéis bugs

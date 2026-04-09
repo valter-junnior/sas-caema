@@ -1,1 +1,0 @@
-1. Não gere muitos readmes, gera apenas um changelog em docs/changelogs/ com data, hora e um nome.
