@@ -51,7 +51,7 @@ echo Gerando instalador...
 echo.
 
 REM Cria diretório de saída
-if not exist "..\releases\installer" mkdir "..\releases\installer"
+if not exist "..\releases" mkdir "..\releases"
 
 REM Compila o script
 %INNO_PATH% "..\installer\setup.iss"
@@ -62,7 +62,7 @@ if %ERRORLEVEL%==0 (
     echo   Instalador criado com sucesso!
     echo ========================================
     echo.
-    echo Instalador: ..\releases\installer\SAS-Caema-Setup.exe
+    echo Instalador: ..\releases\SAS-Caema-Setup.exe
     echo.
 ) else (
     echo.

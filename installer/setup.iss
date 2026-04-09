@@ -66,8 +66,8 @@ Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 ; Atalho na Área de Trabalho (opcional)
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
-; Atalho no Startup (inicialização automática)
-Name: "{userstartup}\{#MyAppName} Checkup"; Filename: "{app}\{#MyStartupExeName}"; Tasks: startupauto
+; Atalho no Startup (inicialização automática) para todos os usuários
+Name: "{commonstartup}\{#MyAppName} Checkup"; Filename: "{app}\{#MyStartupExeName}"; Tasks: startupauto
 
 [Run]
 ; Opção para executar após instalação
