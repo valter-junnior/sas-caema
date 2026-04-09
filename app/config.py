@@ -31,7 +31,7 @@ APP_NAME = "SAS - Caema"
 APP_VERSION = "1.0.0"
 
 GITHUB_APPS_BASE_URL = (
-    "https://raw.githubusercontent.com/valter-junnior/sas-caema-apps/main/app/assets/apps"
+    "https://github.com/valter-junnior/sas-caema/raw/refs/heads/main/app/assets/apps"
 )
 
 # Configurações de UI
