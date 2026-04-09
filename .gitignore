@@ -59,8 +59,8 @@ dist/
 *.manifest
 *.exe.config
 
-# Releases (descomentar se não quiser versionar .exe)
-# releases/*.exe
+# Releases
+releases/
 
 build_temp
 todo.md
