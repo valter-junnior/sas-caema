@@ -107,12 +107,28 @@ installer\Output\                 # Instalador profissional
 
 ### Assets (catálogo e instaladores)
 
-Os assets são hospedados no GitHub:
+Estratégia recomendada (gratuita):
+- `catalog.csv` em repositório GitHub público (raw)
+- instaladores em GitHub Releases (ou raw para arquivos pequenos)
+
+Repositório atual de assets:
 **https://github.com/valter-junnior/sas-caema-apps**
 
 - Ao iniciar o app, o `catalog.csv` é baixado automaticamente em segundo plano.
 - Ao clicar em **Instalar** em um app, o instalador é baixado do GitHub na hora.
 - Nenhuma configuração adicional é necessária.
+
+Formato do `catalog.csv`:
+
+```csv
+id,installer_filename,download_url
+anydesk,AnyDesk.exe,https://github.com/SEU_USUARIO/SEU_REPO/releases/download/apps-v1/AnyDesk.exe
+chrome,ChromeSetup.exe,
+```
+
+Regras:
+- `download_url` preenchido: usa URL direta (ideal para GitHub Releases).
+- `download_url` vazio: usa caminho legado em `raw.githubusercontent.com`.
 
 ### Testar Módulos
 ```powershell

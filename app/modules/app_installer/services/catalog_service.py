@@ -68,6 +68,7 @@ def _read_exe_metadata(path: Path) -> dict:
 class AppEntry:
     id: str
     installer_filename: str
+    download_url: str = ''
     name: str = ''
     version: str = ''
     company: str = ''
@@ -91,7 +92,7 @@ class AppEntry:
 
 
 class CatalogService:
-    """Lê o catálogo (CSV com id + installer_filename) e extrai metadados dos EXEs."""
+    """Lê o catálogo (CSV com id + installer_filename + download_url opcional)."""
 
     def __init__(self):
         self.logger = logger_service.get_logger('CatalogService')
@@ -106,10 +107,14 @@ class CatalogService:
             with open(CATALOG_PATH, encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
+                    installer_filename = (row.get('installer_filename') or '').strip()
                     entry = AppEntry(
-                        id=row['id'].strip(),
-                        installer_filename=row['installer_filename'].strip(),
+                        id=(row.get('id') or '').strip(),
+                        installer_filename=installer_filename,
+                        download_url=(row.get('download_url') or '').strip(),
                     )
+                    if not entry.id or not entry.installer_filename:
+                        continue
                     if entry.is_available:
                         meta = _read_exe_metadata(entry.installer_path)
                         entry.name    = meta['name']
