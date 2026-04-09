@@ -70,6 +70,8 @@ docs/       documentacao
 ## Documentacao
 
 - [docs/documentacao.md](docs/documentacao.md)
+- [docs/diagramas.md](docs/diagramas.md)
+- [docs/operacao.md](docs/operacao.md)
 - [docs/changelogs/](docs/changelogs/)
 
 ## Suporte
