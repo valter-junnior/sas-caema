@@ -36,16 +36,16 @@ class _DownloadThread(QThread):
     success = pyqtSignal()
     failed = pyqtSignal(str)
 
-    def __init__(self, source: str, dest: Path):
+    def __init__(self, filename: str, dest: Path):
         super().__init__()
-        self._source = source
+        self._filename = filename
         self._dest = dest
 
     def run(self):
         try:
             from common.services.github_assets_service import download_app
             download_app(
-                self._source,
+                self._filename,
                 self._dest,
                 progress_callback=lambda d, t: self.progress.emit(d, t),
             )
@@ -347,8 +347,7 @@ class AppsDialog(QDialog):
         prog.setMinimumDuration(0)
         prog.setValue(0)
 
-        source = app.download_url or app.installer_filename
-        thread = _DownloadThread(source, app.installer_path)
+        thread = _DownloadThread(app.installer_filename, app.installer_path)
         self._download_threads.append(thread)
 
         def on_progress(downloaded: int, total: int):

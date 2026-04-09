@@ -48,20 +48,19 @@ Catalogo local:
 
 Fluxo operacional recomendado:
 1. Publicar instalador em GitHub Releases ou repositorio raw.
-2. Atualizar catalog.csv com id, installer_filename e opcional download_url.
+2. Atualizar catalog.csv com id e installer_filename.
 3. Validar download na tela Instalar Aplicativos.
 
 Exemplo de catalog.csv:
 
 ```csv
-id,installer_filename,download_url
-anydesk,AnyDesk.exe,
-chrome,ChromeSetup.exe,https://github.com/SEU_USUARIO/SEU_REPO/releases/download/apps-v1/ChromeSetup.exe
+id,installer_filename
+anydesk,AnyDesk.exe
+chrome,ChromeSetup.exe
 ```
 
 Regra de resolucao:
-- com download_url: usa URL direta;
-- sem download_url: usa raw base + installer_filename.
+- usa sempre a URL base configurada em app/config.py + installer_filename.
 
 ## 6. Logs e diagnostico
 

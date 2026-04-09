@@ -43,14 +43,14 @@ python app.py
 Formato do catalogo:
 
 ```csv
-id,installer_filename,download_url
-anydesk,AnyDesk.exe,https://github.com/SEU_USUARIO/SEU_REPO/releases/download/apps-v1/AnyDesk.exe
-chrome,ChromeSetup.exe,
+id,installer_filename
+anydesk,AnyDesk.exe
+chrome,ChromeSetup.exe
 ```
 
 Regra:
-- Se `download_url` estiver preenchido, usa URL direta.
-- Se `download_url` estiver vazio, usa o caminho legado no repositorio de assets.
+- Se o arquivo ainda nao existir localmente, o app baixa direto do repositorio remoto usando `installer_filename`.
+- A URL base remota fica centralizada em `app/config.py` (`GITHUB_APPS_BASE_URL`).
 
 ## Requisitos
 

@@ -68,7 +68,6 @@ def _read_exe_metadata(path: Path) -> dict:
 class AppEntry:
     id: str
     installer_filename: str
-    download_url: str = ''
     name: str = ''
     version: str = ''
     company: str = ''
@@ -92,7 +91,7 @@ class AppEntry:
 
 
 class CatalogService:
-    """Lê o catálogo (CSV com id + installer_filename + download_url opcional)."""
+    """Lê o catálogo (CSV com id + installer_filename)."""
 
     def __init__(self):
         self.logger = logger_service.get_logger('CatalogService')
@@ -111,7 +110,6 @@ class CatalogService:
                     entry = AppEntry(
                         id=(row.get('id') or '').strip(),
                         installer_filename=installer_filename,
-                        download_url=(row.get('download_url') or '').strip(),
                     )
                     if not entry.id or not entry.installer_filename:
                         continue

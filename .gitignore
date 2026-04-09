@@ -63,9 +63,4 @@ dist/
 # releases/*.exe
 
 build_temp
-
-# Assets de instaladores (baixados do GitHub em runtime)
-app/assets/apps/*
-!app/assets/apps/.gitkeep
-
 todo.md

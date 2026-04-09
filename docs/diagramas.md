@@ -87,12 +87,9 @@ flowchart TD
     E -- Sim --> F[launch_installer ShellExecute runas]
     E -- Nao --> G[_DownloadThread]
 
-    G --> H{download_url preenchido?}
-    H -- Sim --> I[download_app por URL direta]
-    H -- Nao --> J[download_app por raw base + filename]
+    G --> H[download_app por base configurada + installer_filename]
 
-    I --> K[Salva em APPS_DIR]
-    J --> K
+    H --> K[Salva em APPS_DIR]
     K --> F
 ```
 

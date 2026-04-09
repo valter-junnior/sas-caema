@@ -117,14 +117,11 @@ Fluxo:
 - atualiza catalog.csv em background via GitHub;
 - exibe grid de apps;
 - se app nao existe localmente, baixa ao clicar em Instalar;
-- suporta duas fontes:
-  - download_url (URL direta HTTP/HTTPS);
-  - fallback por installer_filename no repositorio raw.
+- baixa sempre por installer_filename usando a base configurada em app/config.py.
 
 Schema do catalog.csv:
 - id (obrigatorio)
 - installer_filename (obrigatorio)
-- download_url (opcional)
 
 ## 5. Design system e UI
 
