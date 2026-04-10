@@ -132,7 +132,8 @@ class AppCard(QFrame):
         badge.setAlignment(Qt.AlignCenter)
         layout.addWidget(badge)
 
-        btn = PrimaryButton("Instalar")
+        btn_text = "Instalar" if self._app.is_available else "Baixar e Instalar"
+        btn = PrimaryButton(btn_text)
         btn.setMinimumHeight(32)
         btn.clicked.connect(lambda: self.install_requested.emit(self._app))
         layout.addWidget(btn)
@@ -195,6 +196,10 @@ class AppsDialog(QDialog):
 
     def _on_catalog_updated(self):
         """Chamado na thread principal quando o catálogo foi atualizado."""
+        self._reload_apps_and_refresh_ui()
+
+    def _reload_apps_and_refresh_ui(self):
+        """Relê catálogo do disco e atualiza a grade preservando o filtro atual."""
         self._service.reload()
         self._all_apps = self._service.get_all()
         current_search = self._search.text().strip()
@@ -202,6 +207,12 @@ class AppsDialog(QDialog):
             self._on_search(current_search)
         else:
             self._render_apps(self._all_apps)
+
+    def _find_app_by_id(self, app_id: str) -> AppEntry | None:
+        for entry in self._all_apps:
+            if entry.id == app_id:
+                return entry
+        return None
 
     def _build_ui(self):
         self.setWindowTitle("Instalador de Aplicativos")
@@ -368,7 +379,9 @@ class AppsDialog(QDialog):
         def on_success():
             prog.setValue(100)
             prog.close()
-            self._launch(app)
+            self._reload_apps_and_refresh_ui()
+            refreshed_app = self._find_app_by_id(app.id) or app
+            self._launch(refreshed_app)
 
         def on_failed(msg: str):
             prog.close()
