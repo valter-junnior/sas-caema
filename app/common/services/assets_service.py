@@ -2,6 +2,8 @@
 
 Files are fetched from the folder configured in config.APPS_BASE_URL.
 """
+import time
+import uuid
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -11,14 +13,21 @@ CATALOG_FILENAME = "catalog.csv"
 _USER_AGENT = "sas-caema/1.0"
 _NO_CACHE_HEADERS = {
     "User-Agent": _USER_AGENT,
-    "Cache-Control": "no-cache",
+    "Cache-Control": "no-cache, no-store, max-age=0",
     "Pragma": "no-cache",
+    "Expires": "0",
 }
+
+
+def _build_uncached_url(filename: str) -> str:
+    base = APPS_BASE_URL.rstrip("/")
+    cache_buster = f"ts={int(time.time() * 1000)}&r={uuid.uuid4().hex}"
+    return f"{base}/{filename}?{cache_buster}"
 
 
 def download_catalog(dest: Path, timeout: int = 15) -> None:
     """Download catalog.csv from remote host and write to dest."""
-    url = f"{APPS_BASE_URL}/{CATALOG_FILENAME}"
+    url = _build_uncached_url(CATALOG_FILENAME)
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = Request(url, headers=_NO_CACHE_HEADERS)
     try:
@@ -39,7 +48,7 @@ def download_app(
     progress_callback(downloaded_bytes: int, total_bytes: int) is called
     periodically if provided. total_bytes may be 0 if Content-Length is absent.
     """
-    url = f"{APPS_BASE_URL}/{filename}"
+    url = _build_uncached_url(filename)
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = Request(url, headers=_NO_CACHE_HEADERS)

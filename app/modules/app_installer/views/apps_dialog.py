@@ -155,7 +155,6 @@ class _CatalogUpdateThread(QThread):
         try:
             from common.services.assets_service import download_catalog
             from config import APPS_DIR
-            import hashlib
             dest = APPS_DIR / "catalog.csv"
             before = dest.read_bytes() if dest.exists() else b""
             download_catalog(dest, timeout=10)
@@ -173,10 +172,20 @@ class AppsDialog(QDialog):
         super().__init__(parent)
         self._download_threads: list[_DownloadThread] = []
         self._catalog_thread: _CatalogUpdateThread | None = None
+        self._refresh_catalog_now()
         self._service = CatalogService()
         self._all_apps = self._service.get_all()
         self._build_ui()
         self._start_catalog_update()
+
+    def _refresh_catalog_now(self):
+        """Tenta baixar o catálogo mais recente antes de montar a tela."""
+        try:
+            from common.services.assets_service import download_catalog
+            from config import APPS_DIR
+            download_catalog(APPS_DIR / "catalog.csv", timeout=10)
+        except Exception:
+            pass  # offline/erro remoto: segue com catálogo local
 
     def _start_catalog_update(self):
         """Inicia download do catalog.csv em background; recarrega grid se mudar."""
