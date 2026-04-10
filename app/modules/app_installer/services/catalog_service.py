@@ -91,7 +91,7 @@ class AppEntry:
 
 
 class CatalogService:
-    """Lê o catálogo (CSV com id + installer_filename)."""
+    """Lê o catálogo (CSV com id + nome + installer_filename)."""
 
     def __init__(self):
         self.logger = logger_service.get_logger('CatalogService')
@@ -109,13 +109,15 @@ class CatalogService:
                     installer_filename = (row.get('installer_filename') or '').strip()
                     entry = AppEntry(
                         id=(row.get('id') or '').strip(),
+                        name=(row.get('nome') or '').strip(),
                         installer_filename=installer_filename,
                     )
                     if not entry.id or not entry.installer_filename:
                         continue
                     if entry.is_available:
                         meta = _read_exe_metadata(entry.installer_path)
-                        entry.name    = meta['name']
+                        if not entry.name:
+                            entry.name = meta['name']
                         entry.version = meta['version']
                         entry.company = meta['company']
                     self._apps.append(entry)

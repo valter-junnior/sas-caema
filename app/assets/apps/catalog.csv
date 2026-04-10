@@ -1,5 +1,8 @@
-id,installer_filename
-anydesk,AnyDesk.exe
-chrome,ChromeSetup.exe
-sas_caema,SAS-Caema-Setup.exe
+id,nome,installer_filename
+anydesk,AnyDesk,AnyDesk.exe
+chrome,Google Chrome,ChromeSetup.exe
+google_earth_pro,Google Earth Pro,GoogleEarthProSetup.exe
+power_bi_desktop,Microsoft Power BI Desktop,PBIDesktopSetup_x64.exe
+adobe_reader,Adobe Acrobat Reader,Reader_br_install.exe
+sas_caema,SAS Caema,SAS-Caema-Setup.exe
 
