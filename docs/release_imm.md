@@ -1,36 +1,29 @@
 # Texto de Release - IMM
 
-## SAS-Caema - Atualizacao de Distribuicao de Apps
+## SAS-Caema v1.0.1-beta
 
-Nesta release, o fluxo de distribuicao de aplicativos foi atualizado para usar um host remoto dedicado de assets.
+Release baseada nos 2 ultimos commits:
+- feat: update app distribution flow to use dedicated remote assets host
+- feat: update catalog CSV structure and enhance metadata extraction in CatalogService
 
 ### O que mudou
 
-- O download de catalogo e instaladores deixou de depender do GitHub.
-- A origem dos arquivos agora utiliza a base:
+- O fluxo de distribuicao de aplicativos passou a usar host remoto dedicado para assets.
+- Download de catalogo e instaladores padronizado para a base:
   - https://sas.areadoaluno.tec.br/assets/apps
-- O servico de download foi renomeado para refletir a nova arquitetura:
-  - de: app/common/services/github_assets_service.py
-  - para: app/common/services/assets_service.py
-- A documentacao tecnica e operacional foi atualizada para o novo fluxo.
-
-### Ajustes de repositorio
-
-- A pasta app/assets/apps passou a ser ignorada no versionamento.
-- Os arquivos dessa pasta foram removidos do indice Git local (cached), evitando novo envio para o GitHub.
+- O catalogo foi evoluido para o formato:
+  - id,nome,installer_filename
+- A aplicacao agora considera o campo `nome` do catalogo para exibir o nome correto do app.
+- A extracao de metadados dos executaveis foi aprimorada, mantendo fallback quando necessario.
 
 ### Beneficios
 
-- Repositorio principal mais leve.
-- Publicacao de instaladores desacoplada do ciclo de release de codigo.
-- Manutencao simplificada do catalogo e dos binarios.
+- Melhora de governanca no catalogo de apps com nome exibido controlado por CSV.
+- Distribuicao de binarios desacoplada do ciclo de release do codigo.
+- Experiencia de instalacao mais consistente para o usuario final.
 
 ### Impacto para o usuario final
 
-- Nenhuma mudanca de uso na interface.
-- O usuario continua clicando em Instalar Aplicativos normalmente.
-- O download passa a ocorrer a partir do novo host remoto.
-
-### Observacao
-
-- Para efetivar a remocao no GitHub, e necessario concluir com commit e push destas alteracoes.
+- Nenhuma mudanca de fluxo na interface.
+- O usuario continua instalando aplicativos pelo mesmo modulo.
+- A lista de aplicativos fica mais precisa e padronizada.
