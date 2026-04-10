@@ -3,7 +3,7 @@
 ; https://jrsoftware.org/isinfo.php
 
 #define MyAppName "SAS-Caema"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.1-beta"
 #define MyAppPublisher "Caema"
 #define MyAppURL "https://caema.com.br"
 #define MyAppExeName "SAS-Caema.exe"

@@ -28,7 +28,7 @@ APPS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Configurações da Aplicação
 APP_NAME = "SAS - Caema"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.0.1-beta"
 
 APPS_BASE_URL = "https://sas.areadoaluno.tec.br/assets/apps"
 
