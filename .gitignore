@@ -49,6 +49,9 @@ local_config.py
 # Imagens geradas
 app/assets/wallpaper_generated.png
 
+# Apps baixados/cache local (nao versionar)
+app/assets/apps/
+
 # Arquivos temporários
 *.tmp
 *.bak

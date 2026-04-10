@@ -6,7 +6,7 @@ Sistema de automacao de suporte para TI da Caema.
 
 - Checkup do sistema com validacoes e correcoes guiadas.
 - Modo startup para rodar verificacoes automaticamente ao iniciar o Windows.
-- Instalador de aplicativos com catalogo remoto (GitHub) e download sob demanda.
+- Instalador de aplicativos com catalogo remoto e download sob demanda.
 - Solucoes rapidas para problemas comuns de suporte.
 - Papel de parede com informacoes tecnicas do equipamento.
 
@@ -49,8 +49,8 @@ chrome,ChromeSetup.exe
 ```
 
 Regra:
-- Se o arquivo ainda nao existir localmente, o app baixa direto do repositorio remoto usando `installer_filename`.
-- A URL base remota fica centralizada em `app/config.py` (`GITHUB_APPS_BASE_URL`).
+- Se o arquivo ainda nao existir localmente, o app baixa direto do host remoto usando `installer_filename`.
+- A URL base remota fica centralizada em `app/config.py` (`APPS_BASE_URL`).
 
 ## Requisitos
 

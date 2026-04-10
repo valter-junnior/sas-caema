@@ -47,7 +47,7 @@ Catalogo local:
 - %LOCALAPPDATA%/SAS-Caema/apps/catalog.csv (exe)
 
 Fluxo operacional recomendado:
-1. Publicar instalador em GitHub Releases ou repositorio raw.
+1. Publicar instalador no host remoto de assets (ex.: https://sas.areadoaluno.tec.br/assets/apps/).
 2. Atualizar catalog.csv com id e installer_filename.
 3. Validar download na tela Instalar Aplicativos.
 

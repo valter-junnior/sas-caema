@@ -17,9 +17,9 @@ _ICON_PATH = ROOT_DIR / "assets" / "images" / "icon.ico"
 
 
 def _fetch_catalog_background():
-    """Baixa o catalog.csv do GitHub em segundo plano ao iniciar."""
+    """Baixa o catalog.csv remoto em segundo plano ao iniciar."""
     try:
-        from common.services.github_assets_service import download_catalog
+        from common.services.assets_service import download_catalog
         from config import APPS_DIR
         download_catalog(APPS_DIR / "catalog.csv")
     except Exception:

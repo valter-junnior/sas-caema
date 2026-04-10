@@ -30,7 +30,7 @@ def _get_icon(app: AppEntry) -> QIcon:
 
 
 class _DownloadThread(QThread):
-    """Thread que baixa um instalador do GitHub e emite progresso."""
+    """Thread que baixa um instalador remoto e emite progresso."""
 
     progress = pyqtSignal(int, int)   # downloaded_bytes, total_bytes
     success = pyqtSignal()
@@ -43,7 +43,7 @@ class _DownloadThread(QThread):
 
     def run(self):
         try:
-            from common.services.github_assets_service import download_app
+            from common.services.assets_service import download_app
             download_app(
                 self._filename,
                 self._dest,
@@ -147,13 +147,13 @@ class AppCard(QFrame):
 
 
 class _CatalogUpdateThread(QThread):
-    """Baixa catalog.csv do GitHub em background."""
+    """Baixa catalog.csv remoto em background."""
 
     updated = pyqtSignal()   # emitido quando o arquivo foi realmente alterado
 
     def run(self):
         try:
-            from common.services.github_assets_service import download_catalog
+            from common.services.assets_service import download_catalog
             from config import APPS_DIR
             import hashlib
             dest = APPS_DIR / "catalog.csv"

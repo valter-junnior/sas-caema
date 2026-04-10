@@ -1,12 +1,11 @@
-"""Downloads catalog.csv and app installers from GitHub.
+"""Downloads catalog.csv and app installers from remote assets host.
 
-Repository: https://github.com/valter-junnior/sas-caema-apps
-Files are fetched from the folder configured in config.GITHUB_APPS_BASE_URL.
+Files are fetched from the folder configured in config.APPS_BASE_URL.
 """
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-from config import GITHUB_APPS_BASE_URL
+from config import APPS_BASE_URL
 
 CATALOG_FILENAME = "catalog.csv"
 _USER_AGENT = "sas-caema/1.0"
@@ -18,8 +17,8 @@ _NO_CACHE_HEADERS = {
 
 
 def download_catalog(dest: Path, timeout: int = 15) -> None:
-    """Download catalog.csv from GitHub and write to dest."""
-    url = f"{GITHUB_APPS_BASE_URL}/{CATALOG_FILENAME}"
+    """Download catalog.csv from remote host and write to dest."""
+    url = f"{APPS_BASE_URL}/{CATALOG_FILENAME}"
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = Request(url, headers=_NO_CACHE_HEADERS)
     try:
@@ -40,7 +39,7 @@ def download_app(
     progress_callback(downloaded_bytes: int, total_bytes: int) is called
     periodically if provided. total_bytes may be 0 if Content-Length is absent.
     """
-    url = f"{GITHUB_APPS_BASE_URL}/{filename}"
+    url = f"{APPS_BASE_URL}/{filename}"
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     req = Request(url, headers=_NO_CACHE_HEADERS)

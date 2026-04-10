@@ -110,11 +110,11 @@ Fluxo:
 Arquivos-chave:
 - app/modules/app_installer/views/apps_dialog.py
 - app/modules/app_installer/services/catalog_service.py
-- app/common/services/github_assets_service.py
+- app/common/services/assets_service.py
 
 Fluxo:
 - le catalog.csv local;
-- atualiza catalog.csv em background via GitHub;
+- atualiza catalog.csv em background via host remoto;
 - exibe grid de apps;
 - se app nao existe localmente, baixa ao clicar em Instalar;
 - baixa sempre por installer_filename usando a base configurada em app/config.py.

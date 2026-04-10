@@ -30,9 +30,7 @@ APPS_DIR.mkdir(parents=True, exist_ok=True)
 APP_NAME = "SAS - Caema"
 APP_VERSION = "1.0.0"
 
-GITHUB_APPS_BASE_URL = (
-    "https://github.com/valter-junnior/sas-caema/raw/refs/heads/main/app/assets/apps"
-)
+APPS_BASE_URL = "https://sas.areadoaluno.tec.br/assets/apps"
 
 # Configurações de UI
 PRIMARY_COLOR = "#0078D4"  # Azul padrão do Windows

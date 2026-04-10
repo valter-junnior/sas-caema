@@ -22,9 +22,9 @@ flowchart TB
 
     A --> AD[AppsDialog]
     AD --> CAT[CatalogService]
-    AD --> GHS[GitHubAssetsService]
+    AD --> AS[AssetsService]
 
-    GHS --> GH[(GitHub Raw / Releases)]
+    AS --> RH[(Host de Assets Remoto)]
 
     WM --> WIN[(Windows API + Registro)]
     PM --> REG[(Registro + netsh)]
@@ -41,11 +41,11 @@ sequenceDiagram
     participant User as Usuario
     participant App as app.py
     participant Main as MainWindow
-    participant Git as github_assets_service
+    participant Assets as assets_service
 
     User->>App: inicia aplicacao
     App->>Main: cria janela principal
-    App->>Git: thread background download_catalog()
+    App->>Assets: thread background download_catalog()
     Main-->>User: exibe 3 acoes principais
 
     alt Rodar Checkup
